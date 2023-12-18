@@ -27,7 +27,7 @@ jobs:
         id: get_branch
 
       - name: Get commit id
-        run: echo "version=$(echo `git ls-remote https://${{ secrets.MY_PAT }}@github.com/ujala-singh/Ubuntu-EC2-Module.git ${{ steps.get_branch.outputs.branch }} | awk '{ print $1}' | cut -c1-7`)" >> $GITHUB_OUTPUT
+        run: echo "version=$(echo `git ls-remote https://${{ secrets.MY_PAT }}@github.com/ujala-singh/github-repository-dispatch-receiver.git ${{ steps.get_branch.outputs.branch }} | awk '{ print $1}' | cut -c1-7`)" >> $GITHUB_OUTPUT
         id: get_version
 
       - name: Get previous tag from the repo
