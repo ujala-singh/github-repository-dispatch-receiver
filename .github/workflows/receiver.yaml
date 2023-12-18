@@ -1,0 +1,103 @@
+name: Github Repository Dispatch Receiver
+ 
+on:
+  repository_dispatch:
+    types: [trigger_workflow]
+ 
+jobs:
+  receiver:
+    runs-on: ubuntu-latest
+    steps:
+      - name: An event received
+        env:
+          REPO_NAME: ${{ github.event.client_payload.repo.name }}
+          BRANCH_NAME: ${{ github.event.client_payload.repo.branch }}
+        run: |
+          echo "This Workflow got triggered from the repo: https://github.com/$REPO_NAME and branch: $BRANCH_NAME."
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          ref: ${{ github.event.client_payload.repo.branch }}
+          fetch-depth: 0
+
+      - name: Get branch name
+        run: echo "branch=${{ github.event.client_payload.repo.branch }}" >> $GITHUB_OUTPUT
+        id: get_branch
+
+      - name: Get commit id
+        run: echo "version=$(echo `git ls-remote https://${{ secrets.MY_PAT }}@github.com/ujala-singh/Ubuntu-EC2-Module.git ${{ steps.get_branch.outputs.branch }} | awk '{ print $1}' | cut -c1-7`)" >> $GITHUB_OUTPUT
+        id: get_version
+
+      - name: Get previous tag from the repo
+        id: get_latest_tag
+        run: |
+          repo_branch=${{ steps.get_branch.outputs.branch }}
+          branch_name="$repo_branch"
+          echo "branch_name=$(echo $branch_name)" >> $GITHUB_OUTPUT
+          tag=$(git tag)
+          git tag | grep $branch_name;
+          tag=$(git tag | grep "\<$branch_name\>" | sort -V | grep 'v[0-9].*' | tail -1)
+          echo $tag
+          echo "tag=$(git tag | grep "\<$branch_name\>" | sort -V | grep 'v[0-9].*' | tail -1)" >> $GITHUB_OUTPUT
+          if echo $tag | grep "999"; then
+              echo "command=$(echo 'm')" >> $GITHUB_OUTPUT
+          else
+              echo "command=$(echo 'p')" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: Get new tag by doing semver version bump
+        id: bump_tag
+        run: |
+          git config --global http.postBuffer 1048576000
+          chmod +x ./scripts/version-upgrade.sh
+          bumped_tag=$(./scripts/version-upgrade.sh -${{ steps.get_latest_tag.outputs.command }} ${{ steps.get_latest_tag.outputs.tag }})
+          echo "new_tag=$(echo $bumped_tag)" >> $GITHUB_OUTPUT
+
+      - name: Create Release on the repo
+        id: create_release
+        uses: ncipollo/release-action@v1.13.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+        with:
+          tag: ${{ steps.bump_tag.outputs.new_tag }}-${{ steps.get_latest_tag.outputs.branch_name }}
+          name: ${{ github.event.repository.name }}
+          body: |
+            ${{ github.event.head_commit.message }}
+            Commit id - ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          owner: ujala-singh
+          repo: Ubuntu-EC2-Module
+
+      - name: Get SHA of the branch
+        id: get_sha
+        run: |
+          branch_name=${{ steps.get_branch.outputs.branch }}
+          sha=$(git rev-parse "refs/heads/$branch_name")
+          echo "GIT_SHA: $sha"
+          echo "sha=${sha}" >> $GITHUB_OUTPUT
+
+      - name: Update Tags
+        id: update_tags
+        run: |
+          #tag existing base tag
+          git tag -f ${{ steps.get_latest_tag.outputs.branch_name }}-base ${{ steps.get_sha.outputs.sha }}
+          #reset base tag 
+          git push origin :refs/tags/${{ steps.get_latest_tag.outputs.branch_name }}-base
+          #push new commit with existing base tag
+          git push origin ${{ steps.get_latest_tag.outputs.branch_name }}-base
+          #tag and push versioned tag
+          git push origin :refs/tags/${{ steps.bump_tag.outputs.new_tag }}-${{ steps.get_latest_tag.outputs.branch_name }}
+          git tag -f ${{ steps.bump_tag.outputs.new_tag }}-${{ steps.get_latest_tag.outputs.branch_name }} ${{ steps.get_sha.outputs.sha }}
+          git push origin ${{ steps.bump_tag.outputs.new_tag }}-${{ steps.get_latest_tag.outputs.branch_name }}
+
+      - name: run ls command
+        run: |
+          ls -la
+
+      - name: Print the file
+        run: |
+          cat ${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt
