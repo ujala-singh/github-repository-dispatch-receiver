@@ -41,8 +41,6 @@ jobs:
           message: 'Append line to file'
           add: '${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt'
           default_author: user_info
-          tag: 'Append-line-${{ github.event.client_payload.repo.branch }} --force'
-          tag_push: '--force'
 
       - name: Get previous tag from the repo
         id: get_latest_tag
