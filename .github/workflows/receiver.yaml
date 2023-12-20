@@ -30,6 +30,20 @@ jobs:
         run: echo "version=$(echo `git ls-remote https://${{ secrets.MY_PAT }}@github.com/ujala-singh/github-repository-dispatch-receiver.git ${{ steps.get_branch.outputs.branch }} | awk '{ print $1}' | cut -c1-7`)" >> $GITHUB_OUTPUT
         id: get_version
 
+      - name: Append line to file
+        run: echo "This got triggered from this commit sha ${{ github.event.client_payload.repo.commit_sha }} from the repo ${{ github.event.client_payload.repo.name }}" >> "${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt"
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9.1.3
+        with:
+          author_name: 'GitHub Actions'
+          author_email: 'actions@github.com'
+          message: 'Append line to file'
+          add: '${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt'
+          default_author: user_info
+          tag: 'Append-line-${{ github.event.client_payload.repo.branch }} --force'
+          tag_push: '--force'
+
       - name: Get previous tag from the repo
         id: get_latest_tag
         run: |
@@ -101,17 +115,3 @@ jobs:
       - name: Print the file
         run: |
           cat ${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt
-
-      - name: Append line to file
-        run: echo "This got triggered from this commit sha ${{ github.event.client_payload.repo.commit_sha }} from the repo ${{ github.event.client_payload.repo.name }}" >> "${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt"
-
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v9.1.3
-        with:
-          author_name: 'GitHub Actions'
-          author_email: 'actions@github.com'
-          message: 'Append line to file'
-          add: '${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt'
-          default_author: user_info
-          tag: 'Append-line-${{ github.event.client_payload.repo.branch }} --force'
-          tag_push: '--force'
