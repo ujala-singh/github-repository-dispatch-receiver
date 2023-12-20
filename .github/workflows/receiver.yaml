@@ -26,10 +26,6 @@ jobs:
         run: echo "branch=${{ github.event.client_payload.repo.branch }}" >> $GITHUB_OUTPUT
         id: get_branch
 
-      - name: Get commit id
-        run: echo "version=$(echo `git ls-remote https://${{ secrets.MY_PAT }}@github.com/ujala-singh/github-repository-dispatch-receiver.git ${{ steps.get_branch.outputs.branch }} | awk '{ print $1}' | cut -c1-7`)" >> $GITHUB_OUTPUT
-        id: get_version
-
       - name: Append line to file
         run: echo "This got triggered from this commit sha ${{ github.event.client_payload.repo.commit_sha }} from the repo ${{ github.event.client_payload.repo.name }}" >> "${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt"
 
@@ -67,6 +63,10 @@ jobs:
           chmod +x ./scripts/version-upgrade.sh
           bumped_tag=$(./scripts/version-upgrade.sh -${{ steps.get_latest_tag.outputs.command }} ${{ steps.get_latest_tag.outputs.tag }})
           echo "new_tag=$(echo $bumped_tag)" >> $GITHUB_OUTPUT
+
+      - name: Get commit id
+        run: echo "version=$(echo `git ls-remote https://${{ secrets.MY_PAT }}@github.com/ujala-singh/github-repository-dispatch-receiver.git ${{ steps.get_branch.outputs.branch }} | awk '{ print $1}' | cut -c1-7`)" >> $GITHUB_OUTPUT
+        id: get_version
 
       - name: Create Release on the repo
         id: create_release
