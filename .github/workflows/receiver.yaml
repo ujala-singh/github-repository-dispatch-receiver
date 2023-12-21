@@ -14,20 +14,29 @@ jobs:
           BRANCH_NAME: ${{ github.event.client_payload.repo.branch }}
         run: |
           echo "This Workflow got triggered from the repo: https://github.com/$REPO_NAME and branch: $BRANCH_NAME."
+      
+      - name: Check if branch is master
+        id: check_branch
+        run: |
+          if [ "${{ github.event.client_payload.repo.branch }}" == "master" ]; then
+            echo "branch=main" >> $GITHUB_OUTPUT
+          else
+            echo "branch=${{ github.event.client_payload.repo.branch }}" >> $GITHUB_OUTPUT
+          fi
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.MY_PAT }}
-          ref: ${{ github.event.client_payload.repo.branch }}
+          ref: ${{ steps.check_branch.outputs.branch }}
           fetch-depth: 0
 
       - name: Get branch name
-        run: echo "branch=${{ github.event.client_payload.repo.branch }}" >> $GITHUB_OUTPUT
+        run: echo "branch=${{ steps.check_branch.outputs.branch }}" >> $GITHUB_OUTPUT
         id: get_branch
 
       - name: Append line to file
-        run: echo "This got triggered from this commit sha ${{ github.event.client_payload.repo.commit_sha }} from the repo ${{ github.event.client_payload.repo.name }}" >> "${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt"
+        run: echo "This got triggered from this commit sha ${{ github.event.client_payload.repo.commit_sha }} from the repo ${{ github.event.client_payload.repo.name }}" >> "${{ steps.get_branch.outputs.branch }}/${{ steps.get_branch.outputs.branch }}.txt"
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v9.1.3
@@ -35,7 +44,7 @@ jobs:
           author_name: 'GitHub Actions'
           author_email: 'actions@github.com'
           message: 'Append line to file'
-          add: '${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt'
+          add: '${{ steps.get_branch.outputs.branch }}/${{ steps.get_branch.outputs.branch }}.txt'
           default_author: user_info
 
       - name: Get previous tag from the repo
@@ -112,4 +121,4 @@ jobs:
 
       - name: Print the file
         run: |
-          cat ${{ github.event.client_payload.repo.branch }}/${{ github.event.client_payload.repo.branch }}.txt
+          cat ${{ steps.get_branch.outputs.branch }}/${{ steps.get_branch.outputs.branch }}.txt
