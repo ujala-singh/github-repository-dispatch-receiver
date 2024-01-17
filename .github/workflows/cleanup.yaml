@@ -30,7 +30,7 @@ jobs:
           # Find and remove tags older than 30 days
           git tag -l | while read -r tag; do
             tag_date=$(git log -1 --format=%ai "$tag" | cut -d' ' -f1)
-            if [[ "$(date -d "$current_date" +%s)" -gt "$(date -d "$tag_date" +%s)" + 2592000 ]]; then
+            if [[ "$(date -d "$current_date" +%s)" -gt $(( $(date -d "$tag_date" +%s) + 2592000 )) ]]; then
               git tag -d "$tag"
               git push origin ":refs/tags/$tag"
             fi
@@ -39,7 +39,7 @@ jobs:
           # Find and remove releases older than 30 days
           gh release list | while read -r release; do
             release_date=$(gh release view "$release" --json created_at --template "{{.created_at}}" | cut -d' ' -f1)
-            if [[ "$(date -d "$current_date" +%s)" -gt "$(date -d "$release_date" +%s)" + 2592000 ]]; then
+            if [[ "$(date -d "$current_date" +%s)" -gt $(( $(date -d "$release_date" +%s) + 2592000 )) ]]; then
               gh release delete "$release" --yes
             fi
           done
