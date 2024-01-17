@@ -1,6 +1,7 @@
 name: Clear Old Releases and Tags
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '*/2 * * * *'
 
