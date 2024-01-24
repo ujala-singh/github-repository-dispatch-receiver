@@ -13,4 +13,4 @@ github-repository-dispatcher-service3:
 github-repository-dispatcher-service4:
   image:
     repository: ghcr.io/atlanhq/github-repository-dispatcher-service4-main
-    tag: dd15446a4e79
+    tag: 9bcfba5c341c
