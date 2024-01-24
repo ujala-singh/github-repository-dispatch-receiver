@@ -53,6 +53,7 @@ jobs:
               # Check if the reviewer is a code owner
               if echo "$CODEOWNERS_CONTENT" | grep -q "$user"; then
                 echo "PR has been approved by code owner, merging..."
+                gh pr edit $pr_number --add-label "codeowner-approved"
                 gh pr merge $pr_number --auto --squash --delete-branch
                 break  # Exit the loop if any reviewer is a code owner
               else
@@ -106,7 +107,7 @@ jobs:
         shell: bash
 
       - name: Rebase "staging" onto "main" when direct push happens to staging
-        if: ${{ steps.merge_status.outputs.status == 'true' && needs.auto_merge.outputs.pr_head_ref == 'main-branch-update-from-values-yaml' }}
+        if: ${{ steps.merge_status.outputs.status == 'true' && needs.auto_merge.outputs.pr_head_ref =~ '^main-branch-update-from-.*-values$' }}
         run: |
           git checkout main
           git pull origin main
@@ -120,7 +121,7 @@ jobs:
         shell: bash
 
       - name: Rebase "staging" onto "main"
-        if: ${{ steps.merge_status.outputs.status == 'true' && needs.auto_merge.outputs.pr_head_ref != 'main-branch-update-from-values-yaml' }}
+        if: ${{ steps.merge_status.outputs.status == 'true' && !(needs.auto_merge.outputs.pr_head_ref =~ '^main-branch-update-from-.*-values$') }}
         run: |
           git checkout main
           # Make sure your local 'main' is up to date with the remote
