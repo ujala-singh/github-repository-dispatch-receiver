@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "Starting workflow..."
+SERVICE_REPO_NAME="$1"
 
 # Function to create the body content and save it to a file
 create_body_file() {
@@ -12,7 +13,7 @@ create_body_file() {
 Summarise your changes in points
 
 - This PR includes changes from charts/values.yaml file.
-- Image Tags are being updated.
+- Image Tag Update: $SERVICE_REPO_NAME
 - 
 
 ## Type of change
@@ -46,15 +47,15 @@ EOF
 create_main_branch_pr() {
   # Switch to the 'main' branch
   git checkout main
-  git checkout -b main-branch-update-from-values-yaml origin/main
+  git checkout -b main-branch-update-from-${SERVICE_REPO_NAME}-values origin/main
   echo "Fetching changes from 'staging'..."
   git fetch origin staging:staging
   echo "Merging changes from 'staging' into the new branch..."
   git merge staging
-  echo "Pushing the changes to main-branch-update-from-values-yaml..."
-  git push origin main-branch-update-from-values-yaml
-  echo "Creating the PR to main branch with branch name as main-branch-update-from-values-yaml..."
-  gh pr create --base main --head main-branch-update-from-values-yaml --title "Merge changes from 'staging' to 'main' (Update Image Tags)" --body "$(cat $BODY_FILE)"
+  echo "Pushing the changes to main-branch-update-from-${SERVICE_REPO_NAME}-values..."
+  git push origin main-branch-update-from-${SERVICE_REPO_NAME}-values
+  echo "Creating the PR to main branch with branch name as main-branch-update-from-${SERVICE_REPO_NAME}-values..."
+  gh pr create --base main --head main-branch-update-from-${SERVICE_REPO_NAME}-values --title "Merge changes from 'staging' to 'main' (Update Image Tags)" --body "$(cat $BODY_FILE)"
 }
 
 # Function to clean up temporary files
