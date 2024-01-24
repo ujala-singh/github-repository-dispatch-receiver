@@ -106,7 +106,7 @@ jobs:
           echo "status=$MERGED" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Rebase "staging" onto "main" when direct push happens to staging
+      - name: Rebase "staging" onto "main"
         if: steps.merge_status.outputs.status == 'true'
         run: |
           regex="^main-branch-update-from-.*-values$"
