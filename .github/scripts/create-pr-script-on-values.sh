@@ -51,8 +51,10 @@ create_main_branch_pr() {
   git checkout -b main-branch-update-from-${SERVICE_REPO_NAME}-values origin/main
   echo "Fetching changes from 'staging'..."
   git fetch origin staging:staging
-  echo "Merging changes from 'staging' into the new branch..."
-  git merge staging
+  echo "Get the latest commit hash from 'staging'"
+  LATEST_COMMIT=$(git rev-parse staging)
+  echo "Reset the new branch to the latest commit from 'staging'"
+  git reset --hard $LATEST_COMMIT
   echo "Pushing the changes to main-branch-update-from-${SERVICE_REPO_NAME}-values..."
   git push origin main-branch-update-from-${SERVICE_REPO_NAME}-values
   echo "Creating the PR to main branch with branch name as main-branch-update-from-${SERVICE_REPO_NAME}-values..."
