@@ -73,17 +73,21 @@ EOF
 
 # Function to create the main branch PR
 create_main_branch_pr() {
+  NEW_BRANCH="main-branch-update-from-${SERVICE_REPO_NAME}-values"
   # Switch to the 'main' branch
   git checkout main
-  git checkout -b main-branch-update-from-${SERVICE_REPO_NAME}-values origin/main
-  git pull origin main-branch-update-from-${SERVICE_REPO_NAME}-values
+  git checkout -b $NEW_BRANCH origin/main
+  # Check if the branch exists remotely
+  if git show-ref --verify --quiet "refs/remotes/origin/$NEW_BRANCH"; then
+    git pull origin $NEW_BRANCH
+  fi
   update_image_tag "$SERVICE_REPO_NAME" "$IMAGE_TAG"
   git add ./charts/values.yaml
   git commit -m "Updating the Image Tag for $SERVICE_REPO_NAME"
-  echo "Pushing the changes to main-branch-update-from-${SERVICE_REPO_NAME}-values..."
-  git push origin main-branch-update-from-${SERVICE_REPO_NAME}-values
-  echo "Creating the PR to main branch with branch name as main-branch-update-from-${SERVICE_REPO_NAME}-values..."
-  gh pr create --base main --head main-branch-update-from-${SERVICE_REPO_NAME}-values --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)"
+  echo "Pushing the changes to $NEW_BRANCH..."
+  git push origin $NEW_BRANCH
+  echo "Creating the PR to main branch with branch name as $NEW_BRANCH..."
+  gh pr create --base main --head $NEW_BRANCH --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)"
 }
 
 # Function to clean up temporary files
