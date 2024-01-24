@@ -76,6 +76,7 @@ create_main_branch_pr() {
   # Switch to the 'main' branch
   git checkout main
   git checkout -b main-branch-update-from-${SERVICE_REPO_NAME}-values origin/main
+  git pull origin main-branch-update-from-${SERVICE_REPO_NAME}-values
   update_image_tag "$SERVICE_REPO_NAME" "$IMAGE_TAG"
   git add ./charts/values.yaml
   git commit -m "Updating the Image Tag for $SERVICE_REPO_NAME"
