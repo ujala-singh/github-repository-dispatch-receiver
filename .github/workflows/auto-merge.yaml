@@ -109,13 +109,13 @@ jobs:
       - name: Rebase "staging" onto "main" when direct push happens to staging
         if: steps.merge_status.outputs.status == 'true'
         run: |
-          regex='^main-branch-update-from-.*-values$'
+          regex="^main-branch-update-from-.*-values$"
           git checkout main
           git pull origin main
           git checkout staging
           git fetch origin
           git branch --set-upstream-to=origin/staging staging
-          if [[ "${needs.auto_merge.outputs.pr_head_ref}" =~ $regex ]]; then
+          if [[ "${{ needs.auto_merge.outputs.pr_head_ref }}" =~ $regex ]]; then
             # Accept Changes From main during the rebase
             git rebase -Xtheirs main
           else
