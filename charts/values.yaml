@@ -1,0 +1,16 @@
+github-repository-dispatcher-service1:
+  image:
+    repository: ghcr.io/atlanhq/github-repository-dispatcher-service1-beta
+    tag: 3521afbab9ca
+github-repository-dispatcher-service2:
+  image:
+    repository: ghcr.io/atlanhq/github-repository-dispatcher-service2-beta
+    tag: 0ff9fd316217
+github-repository-dispatcher-service3:
+  image:
+    repository: ghcr.io/atlanhq/github-repository-dispatcher-service3-beta
+    tag: 24ce49bb0137
+github-repository-dispatcher-service4:
+  image:
+    repository: ghcr.io/atlanhq/github-repository-dispatcher-service4-beta
+    tag: 2803a274787b
