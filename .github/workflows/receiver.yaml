@@ -35,10 +35,21 @@ jobs:
         run: echo "branch=${{ steps.check_branch.outputs.branch }}" >> $GITHUB_OUTPUT
         id: get_branch
 
+      - name: Show Image Tags Before Update
+        run: cat ./charts/values.yaml
+
       - name: Update Image Tag
         run: |
           bash ./.github/scripts/update-image-tag.sh ${{ github.event.client_payload.repo.name }} ${{ github.event.client_payload.repo.image_tag }}
         shell: bash
+
+      - name: Show Image Tags After Update
+        run: cat ./charts/values.yaml
+
+      - name: Git Diff
+        run: |
+          git diff
+          git status
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v9.1.3
