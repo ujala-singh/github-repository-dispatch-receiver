@@ -57,7 +57,7 @@ jobs:
           author_name: 'GitHub Actions'
           author_email: 'actions@github.com'
           message: 'Updating the Image Tag for $REPO_NAME'
-          add: '${{ steps.get_branch.outputs.branch }}/${{ steps.get_branch.outputs.branch }}.txt'
+          add: './charts/values.yaml'
           default_author: user_info
 
       - name: Get previous tag from the repo
