@@ -17,7 +17,7 @@ jobs:
           BRANCH_NAME: ${{ github.event.client_payload.repo.branch }}
         run: |
           echo "This Workflow got triggered from the repo: https://github.com/ujala-singh/$REPO_NAME and branch: $BRANCH_NAME."
-          echo "service_repo_name=$REPO_NAM" >> $GITHUB_OUTPUT
+          echo "service_repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
       
       - name: Check if branch is master
         id: check_branch

@@ -6,6 +6,7 @@ SERVICE_REPO_NAME="$1"
 # Function to create the body content and save it to a file
 create_body_file() {
   local BODY_FILE="$(mktemp)"
+  local SERVICE_REPO_NAME="$SERVICE_REPO_NAME"
 
   cat <<EOF > "$BODY_FILE"
 ## Change Summary
@@ -13,7 +14,7 @@ create_body_file() {
 Summarise your changes in points
 
 - This PR includes changes from charts/values.yaml file.
-- Image Tag Update: $SERVICE_REPO_NAME
+- Image Tag Update: "$SERVICE_REPO_NAME"
 - 
 
 ## Type of change
@@ -55,7 +56,7 @@ create_main_branch_pr() {
   echo "Pushing the changes to main-branch-update-from-${SERVICE_REPO_NAME}-values..."
   git push origin main-branch-update-from-${SERVICE_REPO_NAME}-values
   echo "Creating the PR to main branch with branch name as main-branch-update-from-${SERVICE_REPO_NAME}-values..."
-  gh pr create --base main --head main-branch-update-from-${SERVICE_REPO_NAME}-values --title "Merge changes from 'staging' to 'main' (Update Image Tags)" --body "$(cat $BODY_FILE)"
+  gh pr create --base main --head main-branch-update-from-${SERVICE_REPO_NAME}-values --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)"
 }
 
 # Function to clean up temporary files
