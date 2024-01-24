@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       service_repo_name: ${{ steps.extract_service_repo_name.outputs.service_repo_name }}
+      branch_name: ${{ steps.get_branch.outputs.branch }}
     steps:
       - name: An event received
         id: extract_service_repo_name
@@ -124,6 +125,7 @@ jobs:
   create_main_branch_pr:
     needs: dispatch-receiver
     runs-on: ubuntu-latest
+    if: needs.dispatch-receiver.outputs.branch_name == 'staging'
     steps:
       - uses: actions/checkout@v3
         with:
