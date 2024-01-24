@@ -12,9 +12,8 @@ jobs:
         env:
           REPO_NAME: ${{ github.event.client_payload.repo.name }}
           BRANCH_NAME: ${{ github.event.client_payload.repo.branch }}
-          IMAGE_TAG: ${{ github.event.client_payload.repo.image_tag }}
         run: |
-          echo "This Workflow got triggered from the repo: https://github.com/$REPO_NAME and branch: $BRANCH_NAME."
+          echo "This Workflow got triggered from the repo: https://github.com/ujala-singh/$REPO_NAME and branch: $BRANCH_NAME."
       
       - name: Check if branch is master
         id: check_branch
@@ -38,7 +37,7 @@ jobs:
 
       - name: Update Image Tag
         run: |
-          bash ./.github/scripts/update-image-tag.sh $REPO_NAME $IMAGE_TAG
+          bash ./.github/scripts/update-image-tag.sh ${{ github.event.client_payload.repo.name }} ${{ github.event.client_payload.repo.image_tag }}
         shell: bash
 
       - name: Commit changes
