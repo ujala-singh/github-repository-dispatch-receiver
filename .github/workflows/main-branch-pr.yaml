@@ -1,0 +1,48 @@
+name: Create Main Branch PR
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  create_main_branch_pr:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging' }}
+    steps:
+      - name: Debugging
+        run: |
+          echo "Merged: ${{ github.event.pull_request.merged }}"
+          echo "Base Ref: ${{ github.event.pull_request.base.ref }}"
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          fetch-depth: 0
+
+      - name: Check GitHub CLI version
+        run: gh --version
+      
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+      - name: Fetch latest changes
+        run: git fetch origin
+
+      - name: Pull latest changes
+        run: |
+          git checkout staging
+          git pull origin staging
+          git checkout main
+          git pull origin main
+
+      - name: Create Main Branch PR
+        run: |
+          # Extract the PR number from the merged pull request
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          bash ./.github/scripts/create-pr-script.sh $PR_NUMBER $PR_URL
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}

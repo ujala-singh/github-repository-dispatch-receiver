@@ -1,0 +1,50 @@
+name: Rebase Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Rebase PR branch with base branch
+        continue-on-error: true
+        id: rebase_pr
+        run: |
+          # Fetch the latest changes from the base branch
+          git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+
+          # Checkout the pull request branch
+          git checkout ${{ github.event.pull_request.head.ref }}
+
+          # Rebase the pull request branch with the base branch
+          git rebase ${{ github.event.pull_request.base.ref }}
+
+          # Force push the changes back to the pull request branch
+          git push origin ${{ github.event.pull_request.head.ref }} --force
+
+      - name: Add PR Comment
+        if: steps.rebase_pr.outcome == 'failure'
+        run: |
+          # Get the PR number
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          # Add your comment using gh
+          gh pr comment $PR_NUMBER --body "Your PR is not correctly rebased with ${{ github.event.pull_request.base.ref }} base branch.
+          ---
+          **Hint:** Resolve all conflicts manually, mark them as resolved with"
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}

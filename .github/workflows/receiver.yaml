@@ -12,14 +12,15 @@ jobs:
         env:
           REPO_NAME: ${{ github.event.client_payload.repo.name }}
           BRANCH_NAME: ${{ github.event.client_payload.repo.branch }}
+          IMAGE_TAG: ${{ github.event.client_payload.repo.image_tag }}
         run: |
           echo "This Workflow got triggered from the repo: https://github.com/$REPO_NAME and branch: $BRANCH_NAME."
       
       - name: Check if branch is master
         id: check_branch
         run: |
-          if [ "${{ github.event.client_payload.repo.branch }}" == "master" ]; then
-            echo "branch=main" >> $GITHUB_OUTPUT
+          if [ "${{ github.event.client_payload.repo.branch }}" == "master" ] || [ "${{ github.event.client_payload.repo.branch }}" == "main" ]; then
+            echo "branch=staging" >> $GITHUB_OUTPUT
           else
             echo "branch=${{ github.event.client_payload.repo.branch }}" >> $GITHUB_OUTPUT
           fi
@@ -35,15 +36,17 @@ jobs:
         run: echo "branch=${{ steps.check_branch.outputs.branch }}" >> $GITHUB_OUTPUT
         id: get_branch
 
-      - name: Append line to file
-        run: echo "This got triggered from this commit sha ${{ github.event.client_payload.repo.commit_sha }} from the repo ${{ github.event.client_payload.repo.name }}" >> "${{ steps.get_branch.outputs.branch }}/${{ steps.get_branch.outputs.branch }}.txt"
+      - name: Update Image Tag
+        run: |
+          bash ./.github/scripts/update-image-tag.sh $REPO_NAME $IMAGE_TAG
+        shell: bash
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v9.1.3
         with:
           author_name: 'GitHub Actions'
           author_email: 'actions@github.com'
-          message: 'Append line to file'
+          message: 'Updating the Image Tag for $REPO_NAME'
           add: '${{ steps.get_branch.outputs.branch }}/${{ steps.get_branch.outputs.branch }}.txt'
           default_author: user_info
 
@@ -114,11 +117,3 @@ jobs:
           git push origin :refs/tags/${{ steps.bump_tag.outputs.new_tag }}-${{ steps.get_latest_tag.outputs.branch_name }}
           git tag -f ${{ steps.bump_tag.outputs.new_tag }}-${{ steps.get_latest_tag.outputs.branch_name }} ${{ steps.get_sha.outputs.sha }}
           git push origin ${{ steps.bump_tag.outputs.new_tag }}-${{ steps.get_latest_tag.outputs.branch_name }}
-
-      - name: run ls command
-        run: |
-          ls -la
-
-      - name: Print the file
-        run: |
-          cat ${{ steps.get_branch.outputs.branch }}/${{ steps.get_branch.outputs.branch }}.txt

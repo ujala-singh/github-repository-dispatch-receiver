@@ -1,0 +1,135 @@
+name: Auto Merge Approved PR
+
+on:
+  pull_request_review:
+    types:
+      - submitted
+
+jobs:
+  auto_merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.base.ref == 'main' && github.event.review.state == 'approved' }}
+    outputs:
+      pr_number: ${{ steps.auto_merge_pr.outputs.pr_number }}
+      pr_head_ref: ${{ steps.head_ref.outputs.pr_head_ref }}
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          fetch-depth: 0
+
+      - name: Check GitHub CLI version
+        run: gh --version
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Add Approved label
+        run: |
+          pr_number=$(gh pr view ${{ github.event.pull_request.number }} --json number --jq '.number')
+          gh pr edit $pr_number --add-label "approved"
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+
+      - name: Auto Merge Approved PR
+        id: auto_merge_pr
+        run: |
+          pr_number=${{ github.event.pull_request.number }}
+          review_users=$(gh pr view ${pr_number} --json reviews | jq -r '.reviews[].author.login')
+          # Fetch CODEOWNERS file content
+          CODEOWNERS_CONTENT=$(curl -s "https://api.github.com/repos${{ github.owner }}/${{ github.repository }}/contents/.github/CODEOWNERS" | jq -r '.content' | base64 -d)
+
+          if [[ -n "$review_users" ]]; then
+            for user in $review_users; do
+              echo "Checking code owner for reviewer: $user"
+              # Check if the reviewer is a code owner
+              if echo "$CODEOWNERS_CONTENT" | grep -q "$user"; then
+                echo "PR has been approved by code owner, merging..."
+                gh pr merge $pr_number --auto --squash --delete-branch
+                break  # Exit the loop if any reviewer is a code owner
+              else
+                echo "Reviewer $user is not a code owner."
+              fi
+            done
+          fi
+          echo "pr_number=$pr_number" >> $GITHUB_OUTPUT 
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+
+      - name: Output Head Ref
+        id: head_ref
+        run: |
+          echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT 
+
+  rebase_staging:
+    needs: auto_merge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debugging
+        run: |
+          echo "PR Number: ${{ needs.auto_merge.outputs.pr_number }}"
+          echo "Head Ref: ${{ needs.auto_merge.outputs.pr_head_ref }}"
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Check if PR is merged
+        id: merge_status
+        run: |
+          PR_NUMBER="${{ needs.auto_merge.outputs.pr_number }}"
+          MERGED=$(curl -s -X GET -H "Authorization: Bearer ${{ secrets.MY_PAT }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}" | \
+            jq -r '.merged')
+
+          if [ "$MERGED" == "true" ]; then
+            echo "PR #$PR_NUMBER has been merged."
+          else
+            echo "PR #$PR_NUMBER was closed without merging or not closed yet."
+          fi
+          echo "status=$MERGED" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Rebase "staging" onto "main" when direct push happens to staging
+        if: ${{ steps.merge_status.outputs.status == 'true' && needs.auto_merge.outputs.pr_head_ref == 'main-branch-update-from-values-yaml' }}
+        run: |
+          git checkout main
+          git pull origin main
+          git checkout staging
+          git fetch origin
+          git branch --set-upstream-to=origin/staging staging
+          # Accept Changes From main during the rebase
+          git rebase -Xours main
+          # Force push the changes to staging
+          git push origin staging --force
+        shell: bash
+
+      - name: Rebase "staging" onto "main"
+        if: ${{ steps.merge_status.outputs.status == 'true' && needs.auto_merge.outputs.pr_head_ref != 'main-branch-update-from-values-yaml' }}
+        run: |
+          git checkout main
+          # Make sure your local 'main' is up to date with the remote
+          git pull origin main
+          git checkout staging
+          # Make sure your remote tracking branches are up to date
+          git fetch origin
+          # Set up tracking branch
+          git branch --set-upstream-to=origin/staging staging
+          git rebase main
+          git push origin staging --force
+        shell: bash

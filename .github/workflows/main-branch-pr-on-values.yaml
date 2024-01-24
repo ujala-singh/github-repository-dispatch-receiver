@@ -1,0 +1,41 @@
+name: Create Main Branch PR On Push To charts/values.yaml
+
+on:
+  push:
+    branches:
+      - staging
+    paths:
+      - charts/values.yaml
+
+jobs:
+  create_main_branch_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          fetch-depth: 0
+
+      - name: Check GitHub CLI version
+        run: gh --version
+      
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+      - name: Fetch latest changes
+        run: git fetch origin
+
+      - name: Pull latest changes
+        run: |
+          git checkout staging
+          git pull origin staging
+          git checkout main
+          git pull origin main
+
+      - name: Create Main Branch PR
+        run: |
+          bash ./.github/scripts/create-pr-script-on-values.sh
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
