@@ -114,7 +114,7 @@ jobs:
           git fetch origin
           git branch --set-upstream-to=origin/staging staging
           # Accept Changes From main during the rebase
-          git rebase -Xours main
+          git rebase -Xtheirs main
           # Force push the changes to staging
           git push origin staging --force
         shell: bash

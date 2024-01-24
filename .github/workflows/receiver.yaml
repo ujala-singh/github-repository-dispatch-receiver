@@ -10,6 +10,7 @@ jobs:
     outputs:
       service_repo_name: ${{ steps.extract_service_repo_name.outputs.service_repo_name }}
       branch_name: ${{ steps.get_branch.outputs.branch }}
+      image_tag: ${{ steps.get_image_tag.outputs.image_tag }}
     steps:
       - name: An event received
         id: extract_service_repo_name
@@ -39,6 +40,10 @@ jobs:
       - name: Get branch name
         run: echo "branch=${{ steps.check_branch.outputs.branch }}" >> $GITHUB_OUTPUT
         id: get_branch
+
+      - name: Get Image Tag
+        run: echo "image_tag=${{ github.event.client_payload.repo.image_tag }}" >> $GITHUB_OUTPUT
+        id: get_image_tag
 
       - name: Update Image Tag
         run: |
@@ -152,6 +157,6 @@ jobs:
 
       - name: Create Main Branch PR
         run: |
-          bash ./.github/scripts/create-pr-script-on-values.sh ${{ needs.dispatch-receiver.outputs.service_repo_name }}
+          bash ./.github/scripts/create-pr-script-on-values.sh ${{ needs.dispatch-receiver.outputs.service_repo_name }} ${{ needs.dispatch-receiver.outputs.image_tag }}
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}

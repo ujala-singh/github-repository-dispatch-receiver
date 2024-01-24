@@ -1,7 +1,34 @@
 #!/bin/bash
 
+update_image_tag() {
+  service_name="$1"
+  new_tag="$2"
+  yaml_file="./charts/values.yaml"
+
+  # Check if service name is provided
+  if [ -z "$service_name" ]; then
+    echo "Service name not provided. Exiting..."
+    exit 1
+  fi
+
+  # Check if tag is provided
+  if [ -z "$new_tag" ]; then
+    echo "New tag not provided. Exiting..."
+    exit 1
+  fi
+
+  # Update the tag for the specified service in the YAML file
+  sed -i.bak -e "/$service_name:/,/tag:/ s/tag:.*/tag: $new_tag/" $yaml_file
+
+  # Remove the backup file
+  rm "${yaml_file}.bak"
+
+  echo "Tag updated successfully for $service_name."
+}
+
 echo "Starting workflow..."
 SERVICE_REPO_NAME="$1"
+IMAGE_TAG="$2"
 
 # Function to create the body content and save it to a file
 create_body_file() {
@@ -49,12 +76,7 @@ create_main_branch_pr() {
   # Switch to the 'main' branch
   git checkout main
   git checkout -b main-branch-update-from-${SERVICE_REPO_NAME}-values origin/main
-  echo "Fetching changes from 'staging'..."
-  git fetch origin staging:staging
-  echo "Get the latest commit hash from 'staging'"
-  LATEST_COMMIT=$(git rev-parse staging)
-  echo "Reset the new branch to the latest commit from 'staging'"
-  git reset --hard $LATEST_COMMIT
+  update_image_tag "$SERVICE_REPO_NAME" "$IMAGE_TAG"
   echo "Pushing the changes to main-branch-update-from-${SERVICE_REPO_NAME}-values..."
   git push origin main-branch-update-from-${SERVICE_REPO_NAME}-values
   echo "Creating the PR to main branch with branch name as main-branch-update-from-${SERVICE_REPO_NAME}-values..."
