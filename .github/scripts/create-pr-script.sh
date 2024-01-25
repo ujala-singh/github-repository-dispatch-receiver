@@ -57,8 +57,10 @@ create_main_branch_pr() {
   git checkout -b main-branch-update-from-staging-pr-${PR_NUMBER} origin/main
   # Fetch the changes from the closed pull request
   echo "Fetching changes from PR #$PR_NUMBER..."
-  git fetch origin pull/${PR_NUMBER}/head:${PR_NUMBER}-pr-changes
-  git merge ${PR_NUMBER}-pr-changes
+  merged_commit=$(gh pr view $PR_NUMBER --json mergeCommit | jq -r '.[].oid')
+  echo "Merged Commit Hash: $merged_commit"
+  echo "Cherry Pick Commit to main-branch-update-from-staging-pr-${PR_NUMBER}"
+  git cherry-pick $merged_commit
   echo "Pushing the changes to main-branch-update-from-staging-pr-${PR_NUMBER}..."
   git push origin main-branch-update-from-staging-pr-${PR_NUMBER}
   echo "Creating the PR to main branch with branch name as main-branch-update-from-staging-pr-${PR_NUMBER}..."
