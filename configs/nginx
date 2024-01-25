@@ -1,0 +1,70 @@
+# Specify the user for Nginx to run as
+user www-data;
+
+# Set the number of worker processes based on the number of CPU cores
+worker_processes auto;
+
+# Specify the location of the error log file
+error_log /var/log/nginx/error.log;
+
+# Set the events block to define parameters affecting connection processing
+events {
+    worker_connections 768;
+}
+
+# Define the HTTP server block to configure the server
+http {
+    # Set the MIME types that Nginx will recognize
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # Define the log format for access logs
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    # Specify the access log file
+    access_log /var/log/nginx/access.log main;
+
+    # Define the settings for the server
+    server {
+        # Listen on port 80
+        listen 80;
+
+        # Server name (replace example.com with your domain)
+        server_name example.com www.example.com;
+
+        # Specify the root directory for serving files
+        root /var/www/html;
+
+        # Index files
+        index index.html;
+
+        # Configure error pages
+        error_page 404 /404.html;
+        location = /404.html {
+            root /var/www/html;
+            internal;
+        }
+
+        # Configure the location for static files
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        # Additional configuration for handling PHP files
+        # Uncomment if using PHP
+        # location ~ \.php$ {
+        #     include snippets/fastcgi-php.conf;
+        #     fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+        # }
+
+        # Enable Gzip compression
+        gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+        # Include additional configuration files
+        include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*;
+    }
+}
