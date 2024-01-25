@@ -76,16 +76,23 @@ create_main_branch_pr() {
   NEW_BRANCH="main-branch-update-from-${SERVICE_REPO_NAME}-values"
   # Switch to the 'main' branch
   git checkout main
+  git pull origin main  # Make sure local 'main' is up to date with the remote
+
+  # Switch to the new branch
   git checkout -b $NEW_BRANCH origin/main
+
   # Check if the branch exists remotely
   if git show-ref --verify --quiet "refs/remotes/origin/$NEW_BRANCH"; then
-    git pull origin $NEW_BRANCH
+    git pull origin $NEW_BRANCH --rebase  # Use rebase to reconcile divergent branches
   fi
+
   update_image_tag "$SERVICE_REPO_NAME" "$IMAGE_TAG"
   git add ./charts/values.yaml
   git commit -m "Updating the Image Tag for $SERVICE_REPO_NAME"
+
   echo "Pushing the changes to $NEW_BRANCH..."
-  git push origin $NEW_BRANCH
+  git push origin $NEW_BRANCH --force  # Force push after rebasing
+
   echo "Creating the PR to main branch with branch name as $NEW_BRANCH..."
   gh pr create --base main --head $NEW_BRANCH --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)"
 }
