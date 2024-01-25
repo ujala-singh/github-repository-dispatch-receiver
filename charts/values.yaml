@@ -5,7 +5,7 @@ github-repository-dispatcher-service1:
 github-repository-dispatcher-service2:
   image:
     repository: ghcr.io/atlanhq/github-repository-dispatcher-service2-main
-    tag: f43da4bee097
+    tag: 485de32aeb82
 github-repository-dispatcher-service3:
   image:
     repository: ghcr.io/atlanhq/github-repository-dispatcher-service3-main
