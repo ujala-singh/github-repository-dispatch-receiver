@@ -55,10 +55,10 @@ create_main_branch_pr() {
   git checkout main
   # Create a new branch for the main branch, including the PR number
   git checkout -b main-branch-update-from-staging-pr-${PR_NUMBER} origin/main
-  echo "Fetching changes from 'staging'..."
-  git fetch origin staging:staging
-  echo "Merging changes from 'staging' into the new branch..."
-  git merge staging
+  # Fetch the changes from the closed pull request
+  echo "Fetching changes from PR #$PR_NUMBER..."
+  git fetch origin pull/${PR_NUMBER}/head:${PR_NUMBER}-pr-changes
+  git merge ${PR_NUMBER}-pr-changes
   echo "Pushing the changes to main-branch-update-from-staging-pr-${PR_NUMBER}..."
   git push origin main-branch-update-from-staging-pr-${PR_NUMBER}
   echo "Creating the PR to main branch with branch name as main-branch-update-from-staging-pr-${PR_NUMBER}..."
