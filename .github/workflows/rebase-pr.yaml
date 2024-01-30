@@ -42,7 +42,10 @@ jobs:
         id: rebase_pr
         run: |
           # Fetch the latest changes from the base branch
-          git fetch origin ${{ steps.get_pr_info.outputs.pr_base_ref }}:${{ steps.get_pr_info.outputs.pr_base_ref }}
+          git fetch origin ${{ steps.get_pr_info.outputs.pr_base_ref }}
+
+          # Pull the latest changes from the base branch
+          git pull origin ${{ steps.get_pr_info.outputs.pr_base_ref }}
 
           # Checkout the pull request branch
           git checkout ${{ steps.get_pr_info.outputs.pr_head_ref }}
