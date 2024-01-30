@@ -34,6 +34,8 @@ jobs:
 
           echo "pr_head_ref=$PR_HEAD_REF" >> $GITHUB_OUTPUT
           echo "pr_base_ref=$PR_BASE_REF" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Rebase PR branch with base branch
         continue-on-error: true
