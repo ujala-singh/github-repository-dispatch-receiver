@@ -20,12 +20,22 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Get pull request information
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          PR_HEAD_REF=${{ github.event.issue.pull_request.head.ref }}
+          PR_BASE_REF=${{ github.event.issue.pull_request.base.ref }}
+
+          echo "Pull Request Number: $PR_NUMBER"
+          echo "Pull Request Head Ref: $PR_HEAD_REF"
+          echo "Pull Request Base Ref: $PR_BASE_REF"
+
       - name: Rebase PR branch with base branch
         continue-on-error: true
         id: rebase_pr
         run: |
           # Fetch the latest changes from the base branch
-          git fetch origin${{ github.event.issue.pull_request.base.ref }}:${{ github.event.issue.pull_request.base.ref }}
+          git fetch origin ${{ github.event.issue.pull_request.base.ref }}:${{ github.event.issue.pull_request.base.ref }}
 
           # Checkout the pull request branch
           git checkout ${{ github.event.issue.pull_request.head.ref }}
