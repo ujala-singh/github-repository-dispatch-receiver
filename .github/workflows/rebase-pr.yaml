@@ -25,26 +25,26 @@ jobs:
         id: rebase_pr
         run: |
           # Fetch the latest changes from the base branch
-          git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+          git fetch origin${{ github.event.issue.pull_request.base.ref }}:${{ github.event.issue.pull_request.base.ref }}
 
           # Checkout the pull request branch
-          git checkout ${{ github.event.pull_request.head.ref }}
+          git checkout ${{ github.event.issue.pull_request.head.ref }}
 
           # Rebase the pull request branch with the base branch
-          git rebase ${{ github.event.pull_request.base.ref }}
+          git rebase ${{ github.event.issue.pull_request.base.ref }}
 
           # Force push the changes back to the pull request branch
-          git push origin ${{ github.event.pull_request.head.ref }} --force
+          git push origin ${{ github.event.issue.pull_request.head.ref }} --force
 
       - name: Add PR Comment
         if: steps.rebase_pr.outcome == 'failure'
         run: |
           # Get the PR number
-          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_NUMBER="${{ github.event.issue.number }}"
 
           # Add your comment using gh
-          gh pr comment $PR_NUMBER --body "Your PR is not correctly rebased with ${{ github.event.pull_request.base.ref }} base branch.
+          gh pr comment $PR_NUMBER --body "Your PR is not correctly rebased with ${{ github.event.issue.pull_request.base.ref }} base branch.
           ---
           **Hint:** Resolve all conflicts manually, and push it."
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
