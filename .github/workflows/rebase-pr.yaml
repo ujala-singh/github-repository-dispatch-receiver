@@ -3,7 +3,9 @@ name: Rebase Pull Request
 on:
   pull_request:
     types:
-      - opened
+    - opened
+    - edited
+    - synchronize
 
 jobs:
   rebase:
