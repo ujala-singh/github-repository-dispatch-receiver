@@ -21,30 +21,35 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Get pull request information
+        id: get_pr_info
         run: |
           PR_NUMBER=${{ github.event.issue.number }}
-          PR_HEAD_REF=${{ github.event.issue.pull_request.head.ref }}
-          PR_BASE_REF=${{ github.event.issue.pull_request.base.ref }}
-
+          PR_INFO=$(gh pr view $PR_NUMBER --json headRefName,baseRefName -q ".headRefName, .baseRefName" --template "{{json .}}")
+          # Extract the values and store them in variables
+          PR_HEAD_REF=$(echo $PR_INFO | jq -r '.headRefName')
+          PR_BASE_REF=$(echo $PR_INFO | jq -r '.baseRefName')
           echo "Pull Request Number: $PR_NUMBER"
           echo "Pull Request Head Ref: $PR_HEAD_REF"
           echo "Pull Request Base Ref: $PR_BASE_REF"
+
+          echo "pr_head_ref=$PR_HEAD_REF" >> $GITHUB_OUTPUT
+          echo "pr_base_ref=$PR_BASE_REF" >> $GITHUB_OUTPUT
 
       - name: Rebase PR branch with base branch
         continue-on-error: true
         id: rebase_pr
         run: |
           # Fetch the latest changes from the base branch
-          git fetch origin ${{ github.event.issue.pull_request.base.ref }}:${{ github.event.issue.pull_request.base.ref }}
+          git fetch origin ${{ steps.get_pr_info.outputs.pr_base_ref }}:${{ steps.get_pr_info.outputs.pr_base_ref }}
 
           # Checkout the pull request branch
-          git checkout ${{ github.event.issue.pull_request.head.ref }}
+          git checkout ${{ steps.get_pr_info.outputs.pr_head_ref }}
 
           # Rebase the pull request branch with the base branch
-          git rebase ${{ github.event.issue.pull_request.base.ref }}
+          git rebase ${{ steps.get_pr_info.outputs.pr_base_ref }}
 
           # Force push the changes back to the pull request branch
-          git push origin ${{ github.event.issue.pull_request.head.ref }} --force
+          git push origin ${{ steps.get_pr_info.outputs.pr_head_ref }} --force
 
       - name: Add PR Comment
         if: steps.rebase_pr.outcome == 'failure'
@@ -53,7 +58,7 @@ jobs:
           PR_NUMBER="${{ github.event.issue.number }}"
 
           # Add your comment using gh
-          gh pr comment $PR_NUMBER --body "Your PR is not correctly rebased with ${{ github.event.issue.pull_request.base.ref }} base branch.
+          gh pr comment $PR_NUMBER --body "Your PR is not correctly rebased with ${{ steps.get_pr_info.outputs.pr_base_ref }} base branch.
           ---
           **Hint:** Resolve all conflicts manually, and push it."
         env:
