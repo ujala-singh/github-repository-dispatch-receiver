@@ -24,7 +24,7 @@ jobs:
         id: get_pr_info
         run: |
           PR_NUMBER=${{ github.event.issue.number }}
-          PR_INFO=$(gh pr view $PR_NUMBER --json headRefName,baseRefName -q ".headRefName, .baseRefName" --template "{{json .}}")
+          PR_INFO=$(gh pr view $PR_NUMBER --json headRefName,baseRefName)
           # Extract the values and store them in variables
           PR_HEAD_REF=$(echo $PR_INFO | jq -r '.headRefName')
           PR_BASE_REF=$(echo $PR_INFO | jq -r '.baseRefName')
