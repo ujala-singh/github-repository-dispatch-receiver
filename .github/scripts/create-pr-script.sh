@@ -60,7 +60,7 @@ create_main_branch_pr() {
   merged_commit=$(gh pr view $PR_NUMBER --json mergeCommit | jq -r '.[].oid')
   echo "Merged Commit Hash: $merged_commit"
   echo "Cherry Pick Commit to main-branch-update-from-staging-pr-${PR_NUMBER}"
-  git cherry-pick $merged_commit
+  git cherry-pick -m 1 $merged_commit
   echo "Pushing the changes to main-branch-update-from-staging-pr-${PR_NUMBER}..."
   git push origin main-branch-update-from-staging-pr-${PR_NUMBER}
   echo "Creating the PR to main branch with branch name as main-branch-update-from-staging-pr-${PR_NUMBER}..."
