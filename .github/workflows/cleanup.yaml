@@ -1,4 +1,4 @@
-name: Clear Old Releases and Tags
+name: Clear Old Tags
 
 on:
   workflow_dispatch:
