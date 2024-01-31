@@ -51,7 +51,7 @@ jobs:
           git checkout ${{ steps.get_pr_info.outputs.pr_head_ref }}
 
           # Rebase the pull request branch with the base branch
-          git rebase origin/${{ steps.get_pr_info.outputs.pr_base_ref }}
+          git rebase -Xours origin/${{ steps.get_pr_info.outputs.pr_base_ref }}
 
           # Force push the changes back to the pull request branch
           git push origin ${{ steps.get_pr_info.outputs.pr_head_ref }} --force
