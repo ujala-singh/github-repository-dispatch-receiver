@@ -9,7 +9,7 @@ error_log /var/log/nginx/error.log;
 
 # Set the events block to define parameters affecting connection processing
 events {
-    worker_connections 800;
+    worker_connections 700;
 }
 
 # Define the HTTP server block to configure the server
