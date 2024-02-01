@@ -88,7 +88,7 @@ create_main_branch_pr() {
 
   update_image_tag "$SERVICE_REPO_NAME" "$IMAGE_TAG"
   git add ./charts/values.yaml
-  git commit -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M')) IST"
+  git commit -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
 
   echo "Pushing the changes to $NEW_BRANCH..."
   git push origin $NEW_BRANCH --force  # Force push after rebasing
