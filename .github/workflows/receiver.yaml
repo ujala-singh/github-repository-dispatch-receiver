@@ -153,8 +153,6 @@ jobs:
         run: |
           git checkout staging
           git pull origin staging
-          git checkout main
-          git pull origin main
 
       - name: Create Main Branch PR
         run: |

@@ -1,31 +1,5 @@
 #!/bin/bash
 
-update_image_tag() {
-  service_name="$1"
-  new_tag="$2"
-  yaml_file="./charts/values.yaml"
-
-  # Check if service name is provided
-  if [ -z "$service_name" ]; then
-    echo "Service name not provided. Exiting..."
-    exit 1
-  fi
-
-  # Check if tag is provided
-  if [ -z "$new_tag" ]; then
-    echo "New tag not provided. Exiting..."
-    exit 1
-  fi
-
-  # Update the tag for the specified service in the YAML file
-  sed -i.bak -e "/$service_name:/,/tag:/ s/tag:.*/tag: $new_tag/" $yaml_file
-
-  # Remove the backup file
-  rm "${yaml_file}.bak"
-
-  echo "Tag updated successfully for $service_name."
-}
-
 echo "Starting workflow..."
 SERVICE_REPO_NAME="$1"
 IMAGE_TAG="$2"
@@ -79,17 +53,18 @@ create_main_branch_pr() {
   git pull origin main  # Make sure local 'main' is up to date with the remote
 
   # Switch to the new branch
-  git checkout -b $NEW_BRANCH origin/main
+  git checkout -b $NEW_BRANCH
 
   # Check if the branch exists remotely
   if git show-ref --verify --quiet "refs/remotes/origin/$NEW_BRANCH"; then
     git pull origin $NEW_BRANCH --rebase  # Use rebase to reconcile divergent branches
   fi
 
-  update_image_tag "$SERVICE_REPO_NAME" "$IMAGE_TAG"
-  git add ./charts/values.yaml
-  git commit -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
-
+  commit_id=$(git log -1 --grep="Updating the Image Tag for $SERVICE_REPO_NAME" staging | awk '/^commit/{print $2}')
+  echo "Latest Commit Hash: $commit_id"
+  echo "Cherry Pick Commit to main-branch-update-from-${SERVICE_REPO_NAME}-values"
+  git cherry-pick $commit_id
+  git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
   echo "Pushing the changes to $NEW_BRANCH..."
   git push origin $NEW_BRANCH --force  # Force push after rebasing
 
