@@ -19,3 +19,5 @@ jobs:
         if: steps.pr-details.outputs.user != 'ujala-singh'
         run: |
           gh pr close ${{ github.event.number }} -d
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
