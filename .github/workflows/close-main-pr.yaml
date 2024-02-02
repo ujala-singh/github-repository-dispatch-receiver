@@ -8,7 +8,7 @@ on:
 jobs:
   close-pr:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.user.login != 'atlan-ci' }}
+    if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.user.login != 'ujala-singh' }}
     steps:
       - uses: actions/checkout@v3
         with:
