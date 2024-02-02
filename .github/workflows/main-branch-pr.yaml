@@ -48,7 +48,7 @@ jobs:
           # Extract the PR number from the merged pull request
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_USER="${{ steps.pr-details.outputs.user }}"
+          PR_USER="${{ steps.pr-user.outputs.PR_USER }}"
           bash ./.github/scripts/create-pr-script.sh $PR_NUMBER $PR_URL $PR_USER
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
