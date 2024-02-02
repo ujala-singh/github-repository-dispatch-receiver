@@ -1,4 +1,4 @@
-name: Close Non-Atlan-CI PRs on Main Branch
+name: Close Non-CI PRs on Main Branch
 
 on:
   pull_request:
