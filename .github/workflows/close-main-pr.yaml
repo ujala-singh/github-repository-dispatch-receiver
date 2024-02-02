@@ -1,0 +1,21 @@
+name: Close Non-Atlan-CI PRs on Main Branch
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  close-pr:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.base.ref == 'main' }}
+    steps:
+      - name: Check PR details
+        id: pr-details
+        run: |
+          echo "user=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+      
+      - name: Close PR if conditions are met
+        if: steps.pr-details.outputs.user != 'ujala-singh'
+        run: |
+          gh pr close ${{ github.event.number }} --force

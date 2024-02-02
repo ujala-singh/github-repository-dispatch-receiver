@@ -4,6 +4,7 @@ echo "Starting workflow..."
 
 PR_NUMBER="$1"
 PR_URL="$2"
+PR_USER="$3"
 
 # Function to create the body content and save it to a file
 create_body_file() {
@@ -50,6 +51,7 @@ EOF
 create_main_branch_pr() {
   local PR_NUMBER="$1"
   local BODY_FILE="$2"
+  local PR_USER="$3"
 
   # Switch to the 'main' branch
   git checkout main
@@ -65,6 +67,8 @@ create_main_branch_pr() {
   git push origin main-branch-update-from-staging-pr-${PR_NUMBER}
   echo "Creating the PR to main branch with branch name as main-branch-update-from-staging-pr-${PR_NUMBER}..."
   gh pr create --base main --head main-branch-update-from-staging-pr-${PR_NUMBER} --title "Merge changes from 'staging' to 'main' (PR #$PR_NUMBER)" --body "$(cat $BODY_FILE)"
+  # Add your comment using gh
+  gh pr comment $PR_NUMBER --body "Hey @$PR_USER, your main branch PR has been automatically created. In order to merge the PR, Please test your changes on staging (pre-prod) and update the change summary and checks accordingly."
 }
 
 # Function to clean up temporary files
@@ -74,7 +78,7 @@ cleanup_temp_files() {
 }
 
 BODY_FILE="$(create_body_file "$PR_NUMBER" "$PR_URL")"
-create_main_branch_pr "$PR_NUMBER" "$BODY_FILE"
+create_main_branch_pr "$PR_NUMBER" "$BODY_FILE" "$PR_USER"
 cleanup_temp_files "$BODY_FILE"
 
 echo "Workflow completed successfully."

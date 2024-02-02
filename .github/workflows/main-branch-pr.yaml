@@ -38,11 +38,17 @@ jobs:
           git checkout main
           git pull origin main
 
+      - name: Check PR user
+        id: pr-user
+        run: |
+          echo "PR_USER=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+
       - name: Create Main Branch PR
         run: |
           # Extract the PR number from the merged pull request
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          bash ./.github/scripts/create-pr-script.sh $PR_NUMBER $PR_URL
+          PR_USER="${{ steps.pr-details.outputs.user }}"
+          bash ./.github/scripts/create-pr-script.sh $PR_NUMBER $PR_URL $PR_USER
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
