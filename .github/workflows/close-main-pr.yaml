@@ -18,4 +18,4 @@ jobs:
       - name: Close PR if conditions are met
         if: steps.pr-details.outputs.user != 'ujala-singh'
         run: |
-          gh pr close ${{ github.event.number }} --force
+          gh pr close ${{ github.event.number }} -d
