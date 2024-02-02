@@ -66,9 +66,10 @@ create_main_branch_pr() {
   echo "Pushing the changes to main-branch-update-from-staging-pr-${PR_NUMBER}..."
   git push origin main-branch-update-from-staging-pr-${PR_NUMBER}
   echo "Creating the PR to main branch with branch name as main-branch-update-from-staging-pr-${PR_NUMBER}..."
-  gh pr create --base main --head main-branch-update-from-staging-pr-${PR_NUMBER} --title "Merge changes from 'staging' to 'main' (PR #$PR_NUMBER)" --body "$(cat $BODY_FILE)"
+  PR_CREATE_OUTPUT=$(gh pr create --base main --head main-branch-update-from-staging-pr-${PR_NUMBER} --title "Merge changes from 'staging' to 'main' (PR #$PR_NUMBER)" --body "$(cat $BODY_FILE)")
   # Add your comment using gh
-  gh pr comment $PR_NUMBER --body "Hey @$PR_USER, your main branch PR has been automatically created. In order to merge the PR, Please test your changes on staging (pre-prod) and update the change summary and checks accordingly."
+  echo "PR USER: $PR_USER"
+  gh pr comment $PR_CREATE_OUTPUT --body "Hey @$PR_USER, your main branch PR has been automatically created. In order to merge the PR, Please test your changes on staging (pre-prod) and update the change summary and checks accordingly."
 }
 
 # Function to clean up temporary files
