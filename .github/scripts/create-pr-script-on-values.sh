@@ -60,10 +60,10 @@ create_main_branch_pr() {
     git pull origin $NEW_BRANCH --rebase  # Use rebase to reconcile divergent branches
   fi
 
-  commit_id=$(git log -1 --grep="Updating the Image Tag for $SERVICE_REPO_NAME" staging | awk '/^commit/{print $2}')
-  echo "Latest Commit Hash: $commit_id"
+  latest_commit_id=$(git log --format='%H' --grep="^Updating the Image Tag for $SERVICE_REPO_NAME$" -n 1 staging)
+  echo "Latest Commit Hash: $latest_commit_id"
   echo "Cherry Pick Commit to main-branch-update-from-${SERVICE_REPO_NAME}-values"
-  git cherry-pick $commit_id
+  git cherry-pick $latest_commit_id
   git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
   echo "Pushing the changes to $NEW_BRANCH..."
   git push origin $NEW_BRANCH --force  # Force push after rebasing
