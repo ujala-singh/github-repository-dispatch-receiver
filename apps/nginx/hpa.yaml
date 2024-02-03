@@ -7,8 +7,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: nginx-deployment
-  minReplicas: 10
-  maxReplicas: 30
+  minReplicas: 20
+  maxReplicas: 50
   metrics:
   - type: Resource
     resource:
