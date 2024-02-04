@@ -63,7 +63,8 @@ create_main_branch_pr() {
   latest_commit_id=$(git log --format='%H' --grep="^Updating the Image Tag for $SERVICE_REPO_NAME$" -n 1 staging)
   echo "Latest Commit Hash: $latest_commit_id"
   echo "Cherry Pick Commit to main-branch-update-from-${SERVICE_REPO_NAME}-values"
-  git cherry-pick $latest_commit_id
+  # resolving conflicts in favor of the changes from latest commit
+  git cherry-pick --strategy-option=theirs $latest_commit_id
   git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
   echo "Pushing the changes to $NEW_BRANCH..."
   git push origin $NEW_BRANCH --force  # Force push after rebasing
