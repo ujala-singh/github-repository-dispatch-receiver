@@ -21,7 +21,7 @@ extract_fields() {
     # Extract the owner and repository name
     owner_repo=$(echo "$pr_link" | sed 's|.*github.com/\(.*\)/\(.*\)/pull/.*|\1/\2|')
     # Extract PR title
-    pr_title=$(gh pr view "$(echo "$pr_link" | cut -d'/' -f7)" --json title --jq ".title" --repo "$(echo "$owner_repo")")
+    pr_title=$(gh pr view "$(echo "$pr_link" | cut -d'/' -f7)" --json title --jq ".title" --repo "$(echo "github.com/$owner_repo")")
 }
 
 # Main function
