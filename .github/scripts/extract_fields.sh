@@ -23,7 +23,7 @@ extract_fields() {
     # # Extract PR title
     # pr_title=$(gh pr view "$(echo "$pr_link" | cut -d'/' -f7)" --json title --jq ".title" --repo "$(echo "github.com/$owner_repo")")
     # Set Slack webhook URL
-    webhook_url="$SLACK_WEBHOOK_URL"
+    webhook_url="$2"
 
     # Send message to Slack channel
     curl -X POST \
@@ -48,7 +48,8 @@ extract_fields() {
 # Main function
 main() {
     local body="$1"
-    extract_fields "$body"
+    local webhook_url="$2"
+    extract_fields "$body" "$webhook_url"
 }
 
 # Check if PR body is provided as input
@@ -58,4 +59,4 @@ if [ $# -eq 0 ]; then
 fi
 
 # Execute main function with PR body provided as argument
-main "$1"
+main "$1" "$2"
