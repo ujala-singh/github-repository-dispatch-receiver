@@ -40,7 +40,7 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
         print(response.text)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 6:
         print("Usage: python script.py <short_description_file> <jira_link_file> <pr_link_file> <webhook_url>")
         sys.exit(1)
 
