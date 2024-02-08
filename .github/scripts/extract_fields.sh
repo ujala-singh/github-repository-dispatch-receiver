@@ -47,7 +47,8 @@ extract_fields() {
             }
             }
         ]
-    }" "$webhook_url"
+    }" \
+    "$webhook_url"
 }
 
 # Main function
