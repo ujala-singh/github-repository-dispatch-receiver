@@ -16,7 +16,12 @@ jobs:
 
       - name: Run Script to Extract Fields
         run: |
-          bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}" "${{ secrets.SLACK_WEBHOOK_URL }}"
+          bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
+
+      - name: Run Script to Post Release Message
+        run: |
+          pip3 install requests
+          python script.py short_description.txt jira_link.txt pr_link.txt ${{ secrets.SLACK_WEBHOOK_URL }}
