@@ -1,0 +1,19 @@
+name: Extract PR Fields
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  extract_fields:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          fetch-depth: 0
+
+      - name: Run Script to Extract Fields
+        run: |
+          bash extract_fields.sh "${{ github.event.pull_request.body }}"
