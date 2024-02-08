@@ -27,22 +27,29 @@ extract_fields() {
 
     # Send message to Slack channel
     curl -X POST \
-        --header "Content-type: application/json" \
-        --data '{
-            "blocks": [
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*Short Description: '$short_description'* \n *Jira Ticket Link: '$jira_link'* \n*PR Link: '$pr_link'* "
-                    }
+    --header "Content-type: application/json" \
+    --data '{
+        "blocks": [
+        	{
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Atlan Release Summary :white_tick: :megaphone:*"
                 }
-            ]
-        }' \
-        "$webhook_url"
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Short Description: '$short_description' \n Jira Ticket Link: '$jira_link' \n PR Link: '$pr_link'"
+                }
+            }
+        ]
+    }' \
+    "$webhook_url"
 }
 
 # Main function
