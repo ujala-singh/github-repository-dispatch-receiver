@@ -5,15 +5,15 @@ extract_fields() {
     local body="$1"
 
     # Extract Short Description
-    short_description=$(echo "$1" | grep -oP '(?<=### Short Description\n).*' | sed 's/^ *//;s/ *$//')
+    short_description=$(echo "$1" | awk '/### Short Description/{flag=1; next} /### Jira ticket link/{flag=0} flag' | sed 's/^ *//;s/ *$//')
     echo "Short Description: $short_description"
 
     # Extract Jira Ticket Link
-    jira_link=$(echo "$1" | grep -oP '(?<=### Jira ticket link\n).*' | sed 's/^ *//;s/ *$//')
+    jira_link=$(echo "$1" | awk '/### Jira ticket link/{flag=1; next} /### PR Link/{flag=0} flag' | sed 's/^ *//;s/ *$//')
     echo "Jira Ticket Link: $jira_link"
 
     # Extract PR Link
-    pr_link=$(echo "$1" | grep -oP '(?<=### PR Link\n).*' | sed 's/^ *//;s/ *$//')
+    pr_link=$(echo "$1" | awk '/### PR Link/{flag=1; next} /## Type of change/{flag=0} flag' | sed 's/^ *//;s/ *$//')
     echo "PR Link: $pr_link"
 }
 
