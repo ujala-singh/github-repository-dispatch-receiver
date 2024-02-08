@@ -22,6 +22,15 @@ extract_fields() {
     # owner_repo=$(echo "$pr_link" | sed 's|.*github.com/\(.*\)/\(.*\)/pull/.*|\1/\2|')
     # # Extract PR title
     # pr_title=$(gh pr view "$(echo "$pr_link" | cut -d'/' -f7)" --json title --jq ".title" --repo "$(echo "github.com/$owner_repo")")
+    # Construct Slack message payload
+    payload="{
+    \"text\": \"*Short Description:* $short_description\n*Jira Ticket Link:* $jira_link\n*PR Link:* $pr_link\"
+    }"
+    # Set Slack webhook URL
+    webhook_url="$SLACK_WEBHOOK_URL"
+
+    # Send message to Slack channel
+    curl -X POST -H 'Content-type: application/json' --data "$payload" "$webhook_url"
 }
 
 # Main function
