@@ -25,9 +25,9 @@ extract_fields() {
     # Set Slack webhook URL
     webhook_url="$2"
 
-    # Construct Slack message payload
-    payload="
-    {
+    # Send message to Slack channel
+    curl -X POST -H 'Content-type: application/json' \
+    --data "{
         "blocks": [
             {
             "type": "section",
@@ -47,10 +47,7 @@ extract_fields() {
             }
             }
         ]
-    }"
-
-    # Send message to Slack channel
-    curl -X POST -H 'Content-type: application/json' --data "$payload" "$webhook_url"
+    }" "$webhook_url"
 }
 
 # Main function
