@@ -16,12 +16,12 @@ extract_fields() {
     pr_link=$(echo "$1" | awk '/### PR Link/{flag=1; next} /## Type of change/{flag=0} flag' | sed 's/^ *//;s/ *$//')
     echo "PR Link: $pr_link"
 
-    # Extract PR Title
-    pr_number=$(echo "$pr_link" | cut -d'/' -f7)
-    # Extract the owner and repository name
-    owner_repo=$(echo "$pr_link" | sed 's|.*github.com/\(.*\)/\(.*\)/pull/.*|\1/\2|')
-    # Extract PR title
-    pr_title=$(gh pr view "$(echo "$pr_link" | cut -d'/' -f7)" --json title --jq ".title" --repo "$(echo "github.com/$owner_repo")")
+    # # Extract PR Title
+    # pr_number=$(echo "$pr_link" | cut -d'/' -f7)
+    # # Extract the owner and repository name
+    # owner_repo=$(echo "$pr_link" | sed 's|.*github.com/\(.*\)/\(.*\)/pull/.*|\1/\2|')
+    # # Extract PR title
+    # pr_title=$(gh pr view "$(echo "$pr_link" | cut -d'/' -f7)" --json title --jq ".title" --repo "$(echo "github.com/$owner_repo")")
 }
 
 # Main function
