@@ -16,4 +16,4 @@ jobs:
 
       - name: Run Script to Extract Fields
         run: |
-          bash extract_fields.sh "${{ github.event.pull_request.body }}"
+          bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}"
