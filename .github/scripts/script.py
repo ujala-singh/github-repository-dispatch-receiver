@@ -2,7 +2,7 @@ import sys
 import json
 import requests
 
-def post_to_slack(short_description, jira_link, pr_link, webhook_url):
+def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
     # Construct Slack message payload
     payload = {
         "blocks": [
@@ -21,6 +21,13 @@ def post_to_slack(short_description, jira_link, pr_link, webhook_url):
                 "text": {
                     "type": "mrkdwn",
                     "text": f"{short_description}\n{jira_link}\n{pr_link}"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"PR URL: {pr_url}"
                 }
             }
         ]
@@ -49,5 +56,7 @@ if __name__ == "__main__":
 
     webhook_url = sys.argv[4]
 
+    pr_url = sys.argv[5]
+
     # Send message to Slack
-    post_to_slack(short_description, jira_link, pr_link, webhook_url)
+    post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url)

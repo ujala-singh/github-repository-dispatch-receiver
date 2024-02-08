@@ -14,14 +14,14 @@ extract_fields() {
 
     # Extract PR Link
     pr_link=$(echo "$1" | awk '/### PR Link/{flag=1; next} /## Type of change/{flag=0} flag' | sed 's/^ *//;s/ *$//')
-    echo "PR Link: $pr_link" > pr_link.txt
+    echo "Service PR Links: $pr_link" > pr_link.txt
 }
 
 # Main function
 main() {
     local body="$1"
     local webhook_url="$2"
-    pr_description=$(extract_fields "$body" "$webhook_url")
+    extract_fields "$body" "$webhook_url"
 }
 
 # Check if PR body is provided as input
