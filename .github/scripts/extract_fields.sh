@@ -26,27 +26,30 @@ extract_fields() {
     webhook_url="$2"
 
     # Construct Slack message payload
-    payload="{
-    \"blocks\": [
+    payload=$(cat <<EOF
+    {
+    "blocks": [
         {
-        \"type\": \"section\",
-        \"text\": {
-            \"type\": \"mrkdwn\",
-            \"text\": \"*Atlan Release Summary :white_tick: :megaphone:*\"
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "*Atlan Release Summary :white_tick: :megaphone:*"
         }
         },
         {
-        \"type\": \"divider\"
+        "type": "divider"
         },
         {
-        \"type\": \"section\",
-        \"text\": {
-            \"type\": \"mrkdwn\",
-            \"text\": \"Short Description: $short_description\nJira Ticket Link: $jira_link\nPR Link: $pr_link\"
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Short Description: $short_description\nJira Ticket Link: $jira_link\nPR Link: $pr_link"
         }
         }
     ]
-    }"
+    }
+    EOF
+    )
 
     # Send message to Slack channel
     curl -X POST -H 'Content-type: application/json' --data "$payload" "$webhook_url"
