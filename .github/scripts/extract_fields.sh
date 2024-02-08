@@ -25,6 +25,8 @@ extract_fields() {
     # Set Slack webhook URL
     webhook_url="$2"
 
+    echo "WebHook URL: $webhook_url"
+
     # Send message to Slack channel
     curl -X POST \
     --header "Content-type: application/json" \
