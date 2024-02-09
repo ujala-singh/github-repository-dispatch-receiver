@@ -21,13 +21,13 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
-      - name: echo short_description.txt
+      - name: echo description.txt
         run: |
-          cat /tmp/short_description.txt
+          cat /tmp/description.txt
 
-      - name: echo jira_link.txt
+      - name: echo jira.txt
         run: |
-          cat /tmp/jira_link.txt
+          cat /tmp/jira.txt
 
       - name: echo pr_link.txt
         run: |

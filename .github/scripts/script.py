@@ -2,7 +2,10 @@ import sys
 import json
 import requests
 
-def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
+def post_to_slack(service_name, description, jira, pr_link, pr_url, webhook_url):
+    # Assuming pr_links and jira_links are lists containing the links
+    pr_bullet_points = "\n".join([f"• {link}" for link in pr_link])
+    jira_bullet_points = "\n".join([f"• {link}" for link in jira])
     # Construct Slack message payload
     payload = {
         "blocks": [
@@ -10,7 +13,7 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "*Main Release Summary :white_tick: :megaphone:*"
+                    "text": "*New Production Release :mega:*"
                 }
             },
             {
@@ -20,14 +23,7 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"Short Description: {short_description}\nJira Ticket Link: {jira_link}\nService PR Links: {pr_link}"
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Main PR Link: {pr_url}"
+                    "text": f"*Service: {service_name}* \n *Description:* {description} \n *Jira:* {jira_bullet_points} \n *Pull Requests:* \n{pr_bullet_points}\n• {pr_url}"
                 }
             }
         ]
@@ -40,23 +36,20 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
         print(response.text)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 6:
-        print("Usage: python script.py <short_description_file> <jira_link_file> <pr_link_file> <pr_link> <webhook_url>")
-        sys.exit(1)
-
+    service_name = sys.argv[1]
     # Read content from files
-    with open(sys.argv[1], 'r') as f:
-        short_description = f.read().strip()
-
     with open(sys.argv[2], 'r') as f:
-        jira_link = f.read().strip()
+        description = f.read().strip()
 
     with open(sys.argv[3], 'r') as f:
+        jira = f.read().strip()
+
+    with open(sys.argv[4], 'r') as f:
         pr_link = f.read().strip()
 
-    webhook_url = sys.argv[4]
+    webhook_url = sys.argv[5]
 
-    pr_url = sys.argv[5]
+    pr_url = sys.argv[6]
 
     # Send message to Slack
-    post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url)
+    post_to_slack(service_name, description, jira, pr_link, pr_url, webhook_url)

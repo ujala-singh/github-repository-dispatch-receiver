@@ -10,14 +10,14 @@ add_comment() {
 }
 
 # Check if short_description.txt is empty
-if [ ! -s /tmp/short_description.txt ]; then
+if [ ! -s /tmp/description.txt ]; then
     echo "short_description.txt is empty, failing the action..."
     add_comment "$PR_NUMBER" "Error: Short Description field is empty."
     exit 1
 fi
 
 # Check if jira_link.txt is empty
-if [ ! -s /tmp/jira_link.txt ]; then
+if [ ! -s /tmp/jira.txt ]; then
     echo "jira_link.txt is empty, failing the action..."
     add_comment "$PR_NUMBER" "Error: Jira link field is empty."
     exit 1
