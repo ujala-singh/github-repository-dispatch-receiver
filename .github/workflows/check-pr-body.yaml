@@ -33,9 +33,15 @@ jobs:
         run: |
           cat /tmp/pr_link.txt
 
-      - name: Run Script to Check Fields
+      # - name: Run Script to Check Fields
+      #   run: |
+      #     bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_PAT }}
+      #   shell: bash
+
+      - name: Run Python Script to Check Fields
         run: |
-          bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+          python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}"
         env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
-        shell: bash
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
