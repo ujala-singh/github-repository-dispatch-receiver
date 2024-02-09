@@ -1,0 +1,29 @@
+name: Check PR Fields
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  extract_fields:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_PAT }}
+          fetch-depth: 0
+
+      - name: Run Script to Extract Fields
+        run: |
+          bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}"
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        shell: bash
+
+      - name: Run Script to Post Release Message
+        run: |
+          bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        shell: bash
