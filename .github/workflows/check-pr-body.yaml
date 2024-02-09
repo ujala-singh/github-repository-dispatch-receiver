@@ -38,16 +38,15 @@ jobs:
 
       - name: echo description.txt
         run: |
-          echo "Description:"
-          echo "$PR_DESCRIPTION"
-          echo "Jira Ticket Links:"
-          echo "$PR_JIRA"
-          echo "PR Links:"
-          echo "$PR_LINK"
-        env:
-          PR_DESCRIPTION: ${{ steps.extract_description.outputs.text }}
-          PR_JIRA: ${{ steps.extract_jira_links.outputs.text }}
-          PR_LINK: ${{ steps.extract_pr_links.outputs.text }}
+          cat /tmp/description.txt
+
+      - name: echo jira.txt
+        run: |
+          cat /tmp/jira.txt
+
+      - name: echo pr_link.txt
+        run: |
+          cat /tmp/pr_link.txt
 
       # - name: Run Script to Check Fields
       #   run: |
@@ -58,9 +57,6 @@ jobs:
 
       - name: Run Python Script to Check Fields
         run: |
-          python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}" "$PR_DESCRIPTION" "$PR_JIRA" "$PR_LINK"
+          python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PAT }}
-          PR_DESCRIPTION: ${{ steps.extract_description.outputs.text }}
-          PR_JIRA: ${{ steps.extract_jira_links.outputs.text }}
-          PR_LINK: ${{ steps.extract_pr_links.outputs.text }}
