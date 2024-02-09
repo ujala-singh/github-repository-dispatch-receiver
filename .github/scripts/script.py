@@ -1,5 +1,4 @@
 import sys
-import json
 import requests
 
 def read_file_content(filename):

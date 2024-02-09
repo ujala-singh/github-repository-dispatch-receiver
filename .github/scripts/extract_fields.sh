@@ -4,7 +4,7 @@
 extract_fields() {
     local body="$1"
 
-    # Extract Short Description
+    # Extract Description
     description=$(echo "$1" | awk '/### Description/{flag=1; next} /### Jira Ticket Links/{flag=0} flag' | sed 's/^ *//;s/ *$//')
     echo "$description" > /tmp/description.txt
 

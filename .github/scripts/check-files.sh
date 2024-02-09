@@ -9,24 +9,24 @@ add_comment() {
     gh pr comment $PR_NUMBER --body "$COMMENT"
 }
 
-# Check if short_description.txt is empty
-if [ ! -s /tmp/description.txt ]; then
-    echo "short_description.txt is empty, failing the action..."
-    add_comment "$PR_NUMBER" "Error: Short Description field is empty."
+# Check if description.txt is empty
+if [ ! -s "/tmp/description.txt" ]; then
+    echo "description.txt is empty, failing the action..."
+    add_comment "$PR_NUMBER" "Error: Description field is empty."
     exit 1
 fi
 
-# Check if jira_link.txt is empty
-if [ ! -s /tmp/jira.txt ]; then
-    echo "jira_link.txt is empty, failing the action..."
-    add_comment "$PR_NUMBER" "Error: Jira link field is empty."
+# Check if jira.txt is empty
+if [ ! -s "/tmp/jira.txt" ]; then
+    echo "jira.txt is empty, failing the action..."
+    add_comment "$PR_NUMBER" "Error: Jira Links field is empty."
     exit 1
 fi
 
 # Check if pr_link.txt is empty
-if [ ! -s /tmp/pr_link.txt ]; then
+if [ ! -s "/tmp/pr_link.txt" ]; then
     echo "pr_link.txt is empty, failing the action..."
-    add_comment "$PR_NUMBER" "Error: PR Link field is empty."
+    add_comment "$PR_NUMBER" "Error: PR Links field is empty."
     exit 1
 fi
 
