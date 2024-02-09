@@ -23,4 +23,8 @@ jobs:
 
       - name: Run Script to Post Release Message
         run: |
-          python ./.github/scripts/script.py "example-app-1" /tmp/description.txt /tmp/jira.txt /tmp/pr_link.txt ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
+          python ./.github/scripts/script.py "example-app-1" "$PR_DESCRIPTION" "$PR_JIRA" "$PR_LINK" ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
+        env:
+          PR_DESCRIPTION: ${{ steps.extract_fields.outputs.description }}
+          PR_JIRA: ${{ steps.extract_fields.outputs.jira }}
+          PR_LINK: ${{ steps.extract_fields.outputs.pr_link }}

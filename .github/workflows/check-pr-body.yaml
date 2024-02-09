@@ -23,25 +23,29 @@ jobs:
 
       - name: echo description.txt
         run: |
-          cat /tmp/description.txt
-
-      - name: echo jira.txt
-        run: |
-          cat /tmp/jira.txt
-
-      - name: echo pr_link.txt
-        run: |
-          cat /tmp/pr_link.txt
-
-      - name: Run Script to Check Fields
-        run: |
-          bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+          echo "Description:"
+          echo "$PR_DESCRIPTION"
+          echo "PR_JIRA:"
+          echo "$PR_JIRA"
+          echo "PR_PR_LINK:"
+          echo "$PR_LINK"
         env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
-        shell: bash
+          PR_DESCRIPTION: ${{ steps.extract_fields.outputs.description }}
+          PR_JIRA: ${{ steps.extract_fields.outputs.jira }}
+          PR_LINK: ${{ steps.extract_fields.outputs.pr_link }}
+
+      # - name: Run Script to Check Fields
+      #   run: |
+      #     bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_PAT }}
+      #   shell: bash
 
       - name: Run Python Script to Check Fields
         run: |
-          python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}"
+          python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}" "$PR_DESCRIPTION" "$PR_JIRA" "$PR_LINK"
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+          PR_DESCRIPTION: ${{ steps.extract_fields.outputs.description }}
+          PR_JIRA: ${{ steps.extract_fields.outputs.jira }}
+          PR_LINK: ${{ steps.extract_fields.outputs.pr_link }}
