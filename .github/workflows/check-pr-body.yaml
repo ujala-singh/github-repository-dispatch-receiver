@@ -35,7 +35,24 @@ jobs:
 
       - name: Run Script to Check Fields
         run: |
-          bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          # Assuming the files are present in the repository
+          if [ ! -s "description.txt" ]; then
+              echo "description.txt is empty, failing the action..."
+              gh pr comment $PR_NUMBER --body "Error: Description field is empty."
+              exit 1
+          fi
+          if [ ! -s "jira.txt" ]; then
+              echo "jira.txt is empty, failing the action..."
+              gh pr comment $PR_NUMBER --body "Error: Jira Links field is empty."
+              exit 1
+          fi
+          if [ ! -s "pr_link.txt" ]; then
+              echo "pr_link.txt is empty, failing the action..."
+              gh pr comment $PR_NUMBER --body "Error: PR Links field is empty."
+              exit 1
+          fi
+          echo "All fields are not empty, action can proceed."
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
