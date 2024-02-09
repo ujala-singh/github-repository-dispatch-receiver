@@ -14,34 +14,47 @@ jobs:
           token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
 
+      # - name: Run Script to Extract Fields
+      #   run: |
+      #     bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}"
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_PAT }}
+      #   shell: bash
+
+      # - name: echo description.txt
+      #   run: |
+      #     cat /tmp/description.txt
+
+      # - name: echo jira.txt
+      #   run: |
+      #     cat /tmp/jira.txt
+
+      # - name: echo pr_link.txt
+      #   run: |
+      #     cat /tmp/pr_link.txt
+
+      # - name: Run Script to Check Fields
+      #   run: |
+      #     bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_PAT }}
+      #   shell: bash
+
+      # - name: Run Python Script to Check Fields
+      #   run: |
+      #     python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}"
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+
       - name: Run Script to Extract Fields
         run: |
-          bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}"
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
-        shell: bash
-
-      - name: echo description.txt
-        run: |
-          cat /tmp/description.txt
-
-      - name: echo jira.txt
-        run: |
-          cat /tmp/jira.txt
-
-      - name: echo pr_link.txt
-        run: |
-          cat /tmp/pr_link.txt
-
-      - name: Run Script to Check Fields
-        run: |
-          bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
+          bash ./.github/scripts/extract-fields.sh "${{ github.event.pull_request.body }}"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
       - name: Run Python Script to Check Fields
         run: |
-          python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}"
+          python ./.github/scripts/check-pr-files-script.py "${{ github.event.pull_request.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PAT }}
