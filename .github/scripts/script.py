@@ -10,7 +10,7 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "*Atlan Release Summary :white_tick: :megaphone:*"
+                    "text": "*Main Release Summary :white_tick: :megaphone:*"
                 }
             },
             {
@@ -27,7 +27,7 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"PR URL: {pr_url}"
+                    "text": f"Main PR Link: {pr_url}"
                 }
             }
         ]
@@ -41,7 +41,7 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
 
 if __name__ == "__main__":
     if len(sys.argv) != 6:
-        print("Usage: python script.py <short_description_file> <jira_link_file> <pr_link_file> <webhook_url>")
+        print("Usage: python script.py <short_description_file> <jira_link_file> <pr_link_file> <pr_link> <webhook_url>")
         sys.exit(1)
 
     # Read content from files
