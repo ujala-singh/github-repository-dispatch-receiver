@@ -21,21 +21,6 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
-      - uses: pCYSl5EDgo/cat@master
-        id: extract_description
-        with:
-          path: /tmp/description_filter.txt
-
-      - uses: pCYSl5EDgo/cat@master
-        id: extract_jira_links
-        with:
-          path: /tmp/jira_filter.txt
-
-      - uses: pCYSl5EDgo/cat@master
-        id: extract_pr_links
-        with:
-          path: /tmp/pr_link_filter.txt
-
       - name: echo description.txt
         run: |
           cat /tmp/description.txt
@@ -48,15 +33,9 @@ jobs:
         run: |
           cat /tmp/pr_link.txt
 
-      # - name: Run Script to Check Fields
-      #   run: |
-      #     bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
-      #   env:
-      #     GH_TOKEN: ${{ secrets.MY_PAT }}
-      #   shell: bash
-
-      - name: Run Python Script to Check Fields
+      - name: Run Script to Check Fields
         run: |
-          python ./.github/scripts/check-pr-files.py "${{ github.event.pull_request.number }}"
+          bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        shell: bash

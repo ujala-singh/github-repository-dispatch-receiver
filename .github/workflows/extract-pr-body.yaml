@@ -21,25 +21,6 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
-      - uses: pCYSl5EDgo/cat@master
-        id: extract_description
-        with:
-          path: /tmp/description_filter.txt
-
-      - uses: pCYSl5EDgo/cat@master
-        id: extract_jira_links
-        with:
-          path: /tmp/jira_filter.txt
-
-      - uses: pCYSl5EDgo/cat@master
-        id: extract_pr_links
-        with:
-          path: /tmp/pr_link_filter.txt
-
       - name: Run Script to Post Release Message
         run: |
-          python ./.github/scripts/script.py "example-app-1" "$PR_DESCRIPTION" "$PR_JIRA" "$PR_LINK" ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
-        env:
-          PR_DESCRIPTION: ${{ steps.extract_description.outputs.text }}
-          PR_JIRA: ${{ steps.extract_jira_links.outputs.text }}
-          PR_LINK: ${{ steps.extract_pr_links.outputs.text }}
+          python ./.github/scripts/script.py "example-app-1" /tmp/description.txt /tmp/jira.txt /tmp/pr_link.txt ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
