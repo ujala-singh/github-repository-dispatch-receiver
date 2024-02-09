@@ -15,6 +15,14 @@ extract_fields() {
     # Extract PR Link
     pr_link=$(echo "$1" | awk '/### PR Links/{flag=1; next} /## Type of change/{flag=0} flag' | sed 's/^ *//;s/ *$//')
     echo "$pr_link" > /tmp/pr_link.txt
+
+    description=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' /tmp/description.txt | sed '/^$/d')
+    jira=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' /tmp/jira.txt | sed '/^$/d')
+    pr_link=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' /tmp/pr_link.txt | sed '/^$/d')
+
+    echo "$description" > /tmp/description.txt
+    echo "$jira" > /tmp/jira.txt
+    echo "$pr_link" > /tmp/pr_link.txt
 }
 
 # Main function
