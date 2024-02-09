@@ -21,28 +21,25 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
-      - name: Extract Description
+      - uses: pCYSl5EDgo/cat@master
         id: extract_description
-        run: |
-          description=$(cat /tmp/description.txt)
-          echo "description=$description" >> $GITHUB_OUTPUT
+        with:
+          path: /tmp/description.txt
 
-      - name: Extract Jira Ticket Link
+      - uses: pCYSl5EDgo/cat@master
         id: extract_jira_links
-        run: |
-          jira=$(cat /tmp/jira.txt)
-          echo "jira_links=$jira_links" >> $GITHUB_OUTPUT
+        with:
+          path: /tmp/jira.txt
 
-      - name: Extract PR Link
+      - uses: pCYSl5EDgo/cat@master
         id: extract_pr_links
-        run: |
-          pr_link=$(cat /tmp/pr_link.txt)
-          echo "pr_link=$pr_link" >> $GITHUB_OUTPUT
+        with:
+          path: /tmp/pr_link.txt
 
       - name: Run Script to Post Release Message
         run: |
           python ./.github/scripts/script.py "example-app-1" "$PR_DESCRIPTION" "$PR_JIRA" "$PR_LINK" ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
         env:
-          PR_DESCRIPTION: ${{ steps.extract_description.outputs.description }}
-          PR_JIRA: ${{ steps.extract_jira_links.outputs.jira_links }}
-          PR_LINK: ${{ steps.extract_pr_links.outputs.pr_link }}
+          PR_DESCRIPTION: ${{ steps.extract_description.outputs.text }}
+          PR_JIRA: ${{ steps.extract_jira_links.outputs.text }}
+          PR_LINK: ${{ steps.extract_pr_links.outputs.text }}
