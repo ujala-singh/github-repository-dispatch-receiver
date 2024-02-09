@@ -53,6 +53,10 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
+      - name: Json File
+        run: |
+          cat /tmp/combined.json
+
       - name: Run Python Script to Check Fields
         run: |
           python ./.github/scripts/check-pr-files-script.py "${{ github.event.pull_request.number }}"
