@@ -20,7 +20,7 @@ def post_to_slack(short_description, jira_link, pr_link, pr_url, webhook_url):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"{short_description}\n{jira_link}\n{pr_link}"
+                    "text": f"Short Description: {short_description}\nJira Ticket Link: {jira_link}\nService PR Links: {pr_link}"
                 }
             },
             {

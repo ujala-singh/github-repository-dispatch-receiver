@@ -21,25 +21,9 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
-      - name: echo short_description.txt
-        run: |
-          cat /tmp/short_description.txt
-
-      - name: echo jira_link.txt
-        run: |
-          cat /tmp/jira_link.txt
-
-      - name: echo pr_link.txt
-        run: |
-          cat /tmp/pr_link.txt
-
       - name: Run Script to Check Fields
         run: |
           bash ./.github/scripts/check-files.sh "${{ github.event.pull_request.number }}"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
-
-      - name: Remove Files
-        run: |
-          rm -f /tmp/pr_link.txt /tmp/jira_link.txt /tmp/short_description.txt
