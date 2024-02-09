@@ -3,7 +3,7 @@ import requests
 
 def read_file_content(filename):
     with open(filename, 'r') as f:
-        return f.read().strip()
+        return f.read().rstrip()
 
 def post_to_slack(service_name, description, jira, pr_links, pr_url, webhook_url):
     # Construct Slack message payload

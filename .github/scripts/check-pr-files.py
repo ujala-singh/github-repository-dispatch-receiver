@@ -16,9 +16,10 @@ def add_comment(pr_number, comment):
     # Execute the curl command
     subprocess.run(curl_command, shell=True)
 
-def check_empty_fields(pr_number, field_paths):
+def check_empty_fields(field_paths):
     empty_fields = []
     for field_path, field_name in field_paths.items():
+        print(f"{field_path}: {os.path.getsize(field_path)}")
         if os.path.isfile(field_path) and os.path.getsize(field_path) == 0:
             empty_fields.append(field_name)
     return empty_fields
@@ -32,7 +33,7 @@ if __name__ == "__main__":
     }
 
     # Check for empty fields
-    empty_fields = check_empty_fields(pr_number, field_paths)
+    empty_fields = check_empty_fields(field_paths)
 
     if not empty_fields:
         print("All fields are not empty, action can proceed.")

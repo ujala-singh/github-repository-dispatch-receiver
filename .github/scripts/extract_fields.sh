@@ -20,8 +20,7 @@ extract_fields() {
 # Main function
 main() {
     local body="$1"
-    local webhook_url="$2"
-    extract_fields "$body" "$webhook_url"
+    extract_fields "$body"
 }
 
 # Check if PR body is provided as input
