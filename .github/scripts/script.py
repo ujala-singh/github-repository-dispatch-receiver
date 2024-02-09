@@ -2,11 +2,16 @@ import sys
 import json
 import requests
 
-def post_to_slack(service_name, description, jira, pr_link, pr_url, webhook_url):
-    # Assuming pr_links and jira_links are lists containing the links
-    pr_bullet_points = "\n".join([f"• {link}" for link in pr_link])
-    jira_bullet_points = "\n".join([f"• {link}" for link in jira])
+def read_file_content(filename):
+    with open(filename, 'r') as f:
+        return f.read().strip()
+
+def post_to_slack(service_name, description, jira, pr_links, pr_url, webhook_url):
     # Construct Slack message payload
+    description_bullet_points = "\n".join([f"• {point.lstrip('-')}" for point in description])
+    pr_bullet_points = "\n".join([f"• {link.lstrip('-')}" for link in pr_links])
+    jira_bullet_points = "\n".join([f"• {link.lstrip('-')}" for link in jira])
+
     payload = {
         "blocks": [
             {
@@ -23,7 +28,7 @@ def post_to_slack(service_name, description, jira, pr_link, pr_url, webhook_url)
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*Service: {service_name}* \n *Description:* {description} \n *Jira:* {jira_bullet_points} \n *Pull Requests:* \n{pr_bullet_points}\n• {pr_url}"
+                    "text": f"*Service: {service_name}*\n*Description:*\n{description_bullet_points}\n*Jira:*\n{jira_bullet_points}\n*Pull Requests:*\n{pr_bullet_points}\n• {pr_url}"
                 }
             }
         ]
@@ -36,20 +41,21 @@ def post_to_slack(service_name, description, jira, pr_link, pr_url, webhook_url)
         print(response.text)
 
 if __name__ == "__main__":
+    if len(sys.argv) != 7:
+        print("Usage: python script.py <service_name> <description_file> <jira_file> <pr_link_file> <webhook_url> <pr_url>")
+        sys.exit(1)
+
     service_name = sys.argv[1]
-    # Read content from files
-    with open(sys.argv[2], 'r') as f:
-        description = f.read().strip()
-
-    with open(sys.argv[3], 'r') as f:
-        jira = f.read().strip()
-
-    with open(sys.argv[4], 'r') as f:
-        pr_link = f.read().strip()
-
+    description_file = sys.argv[2]
+    jira_file = sys.argv[3]
+    pr_link_file = sys.argv[4]
     webhook_url = sys.argv[5]
-
     pr_url = sys.argv[6]
 
+    # Read content from files
+    description = read_file_content(description_file).split('\n')
+    jira = read_file_content(jira_file).split('\n')
+    pr_links = read_file_content(pr_link_file).split('\n')
+
     # Send message to Slack
-    post_to_slack(service_name, description, jira, pr_link, pr_url, webhook_url)
+    post_to_slack(service_name, description, jira, pr_links, pr_url, webhook_url)
