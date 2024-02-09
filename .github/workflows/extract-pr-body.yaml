@@ -14,22 +14,29 @@ jobs:
           token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
 
+      - name: Run Script to Extract Fields
+        run: |
+          bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}"
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        shell: bash
+
       - name: Extract Description
         id: extract_description
         run: |
-          description=$(echo "${{ github.event.pull_request.body }}" | awk '/### Description/{flag=1; next} /### Jira Ticket Links/{flag=0} flag' | sed 's/^ *//;s/ *$//')
+          description=$(cat /tmp/description.txt)
           echo "description=$description" >> $GITHUB_OUTPUT
 
       - name: Extract Jira Ticket Link
         id: extract_jira_links
         run: |
-          jira=$(echo "${{ github.event.pull_request.body }}" | awk '/### Jira Ticket Links/{flag=1; next} /### PR Links/{flag=0} flag' | sed 's/^ *//;s/ *$//')
+          jira=$(cat /tmp/jira.txt)
           echo "jira_links=$jira_links" >> $GITHUB_OUTPUT
 
       - name: Extract PR Link
         id: extract_pr_links
         run: |
-          pr_link=$(echo "${{ github.event.pull_request.body }}" | awk '/### PR Links/{flag=1; next} /## Type of change/{flag=0} flag' | sed 's/^ *//;s/ *$//')
+          pr_link=$(cat /tmp/pr_link.txt)
           echo "pr_link=$pr_link" >> $GITHUB_OUTPUT
 
       - name: Run Script to Post Release Message
