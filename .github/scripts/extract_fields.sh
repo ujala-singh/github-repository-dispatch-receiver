@@ -17,11 +17,25 @@ extract_fields() {
     echo "$pr_link" > /tmp/pr_link.txt
 }
 
+filter_files() {
+    # Remove extra whitespace or empty lines from description file
+    description=$(grep -vE '^\s*$' /tmp/description.txt)
+    echo "$description" > /tmp/description_filter.txt
+
+    # Remove extra whitespace or empty lines from Jira file
+    jira=$(grep -vE '^\s*$' /tmp/jira.txt)
+    echo "$jira" > /tmp/jira_filter.txt
+
+    # Remove extra whitespace or empty lines from PR link file
+    pr_link=$(grep -vE '^\s*$' /tmp/pr_link.txt)
+    echo "$pr_link" > /tmp/pr_link_filter.txt
+}
 # Main function
 main() {
     local body="$1"
     local webhook_url="$2"
     extract_fields "$body" "$webhook_url"
+    filter_files
 }
 
 # Check if PR body is provided as input

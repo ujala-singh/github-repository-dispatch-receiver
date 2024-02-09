@@ -24,17 +24,17 @@ jobs:
       - uses: pCYSl5EDgo/cat@master
         id: extract_description
         with:
-          path: /tmp/description.txt
+          path: /tmp/description_filter.txt
 
       - uses: pCYSl5EDgo/cat@master
         id: extract_jira_links
         with:
-          path: /tmp/jira.txt
+          path: /tmp/jira_filter.txt
 
       - uses: pCYSl5EDgo/cat@master
         id: extract_pr_links
         with:
-          path: /tmp/pr_link.txt
+          path: /tmp/pr_link_filter.txt
 
       - name: Run Script to Post Release Message
         run: |
