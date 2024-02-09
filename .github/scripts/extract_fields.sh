@@ -6,15 +6,15 @@ extract_fields() {
 
     # Extract Short Description
     short_description=$(echo "$1" | awk '/### Short Description/{flag=1; next} /### Jira ticket link/{flag=0} flag' | sed 's/^ *//;s/ *$//')
-    echo "Short Description: $short_description" > short_description.txt
+    echo "Short Description: $short_description" > /tmp/short_description.txt
 
     # Extract Jira Ticket Link
     jira_link=$(echo "$1" | awk '/### Jira ticket link/{flag=1; next} /### PR Link/{flag=0} flag' | sed 's/^ *//;s/ *$//')
-    echo "Jira Ticket Link: $jira_link" > jira_link.txt
+    echo "Jira Ticket Link: $jira_link" > /tmp/jira_link.txt
 
     # Extract PR Link
     pr_link=$(echo "$1" | awk '/### PR Link/{flag=1; next} /## Type of change/{flag=0} flag' | sed 's/^ *//;s/ *$//')
-    echo "Service PR Links: $pr_link" > pr_link.txt
+    echo "Service PR Links: $pr_link" > /tmp/pr_link.txt
 }
 
 # Main function
