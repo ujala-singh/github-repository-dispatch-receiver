@@ -2,7 +2,10 @@ name: Check PR Fields
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
   check_fields:

@@ -1,13 +1,14 @@
-name: Extract PR Fields
+name: Post Release Message on Slack
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    types:
+      - closed
 
 jobs:
   extract_fields:
     runs-on: ubuntu-latest
-
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
     steps:
       - uses: actions/checkout@v3
         with:
