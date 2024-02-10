@@ -33,7 +33,7 @@ def check_empty_fields(field_paths):
     for field_path, field_name in field_paths.items():
         print(f"{field_path}: {os.path.getsize(field_path)}")
         # Check if the file is empty or has a size less than 3 bytes
-        if os.path.isfile(field_path) and os.path.getsize(field_path) == 0:
+        if "description" in field_path and os.path.getsize(field_path) < 100:
             empty_fields.append(field_name)
         # Check if the file contains specific text based on its name
         if "jira" in field_path:
@@ -65,5 +65,11 @@ if __name__ == "__main__":
         print("All fields are not empty, action can proceed.")
     else:
         print("Failing the action as the following fields are empty:", ", ".join(empty_fields))
-        add_comment(pr_number, f"Error: The following fields are empty: {', '.join(empty_fields)}", github_token)
+        if "Description" in empty_fields:
+            comment=f"Error: The following fields are empty: {', '.join(empty_fields)}
+            ---
+            **Hint:** Your description is too short. Please add relevant information about the changes."
+            add_comment(pr_number, comment, github_token)
+        else:
+            add_comment(pr_number, f"Error: The following fields are empty: {', '.join(empty_fields)}", github_token)
         sys.exit(1)
