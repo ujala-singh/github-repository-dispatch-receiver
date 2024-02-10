@@ -10,36 +10,30 @@ create_body_file() {
   local SERVICE_REPO_NAME="$SERVICE_REPO_NAME"
 
   cat <<EOF > "$BODY_FILE"
-## Change Summary
+## Summary
 
-Summarise your changes in points
+### Description
 
-- This PR includes changes from charts/values.yaml file.
 - Image Tag Update: "$SERVICE_REPO_NAME"
-- 
+-
+
+### Jira Ticket Links
+
+### PR Links
 
 ## Type of change
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
-- [ ] Code refactoring (restructuring existing code without changing any functionality)
+- [ ] Code refactoring (restructing existing code without changing any functionality)
 - [ ] This change requires a documentation update
-
-## Documentation/Release Plan
-
-- [Problem Statement doc]()
-- [Feature documentation]()
-- [Release plan]()
 
 ## Testing Checklist
 
 Changes tested on
-- [ ] development
-- [ ] production
+- [ ] staging (pre-prod)
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)
-
----
 EOF
 
   echo "$BODY_FILE"

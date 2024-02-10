@@ -1,5 +1,14 @@
 import sys
 import requests
+import re
+
+def extract_service_name(branch_name):
+    regex = r"^main-branch-update-from-(.*)-values$"
+    match = re.match(regex, branch_name)
+    if match:
+        return match.group(1)
+    else:
+        return "Receiver Helm Repo"
 
 def read_file_content(filename):
     with open(filename, 'r') as f:
@@ -44,7 +53,7 @@ if __name__ == "__main__":
         print("Usage: python script.py <service_name> <description_file> <jira_file> <pr_link_file> <webhook_url> <pr_url>")
         sys.exit(1)
 
-    service_name = sys.argv[1]
+    branch_name = sys.argv[1]
     description_file = sys.argv[2]
     jira_file = sys.argv[3]
     pr_link_file = sys.argv[4]
@@ -56,5 +65,7 @@ if __name__ == "__main__":
     jira = read_file_content(jira_file).split('\n')
     pr_links = read_file_content(pr_link_file).split('\n')
 
+    # Extract Service Name
+    service_name = extract_service_name(branch_name)
     # Send message to Slack
     post_to_slack(service_name, description, jira, pr_links, pr_url, webhook_url)
