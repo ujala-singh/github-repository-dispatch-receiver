@@ -66,9 +66,7 @@ if __name__ == "__main__":
     else:
         print("Failing the action as the following fields are empty:", ", ".join(empty_fields))
         if "Description" in empty_fields:
-            comment=f"Error: The following fields are empty: {', '.join(empty_fields)}
-            ---
-            **Hint:** Your description is too short. Please add relevant information about the changes."
+            comment = f"Error: The following fields are empty: {', '.join(empty_fields)}" + "\n" + "---\n" + "**Hint:** Pull Request description is too short. Please add relevant information about the changes."
             add_comment(pr_number, comment, github_token)
         else:
             add_comment(pr_number, f"Error: The following fields are empty: {', '.join(empty_fields)}", github_token)
