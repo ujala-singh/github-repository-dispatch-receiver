@@ -68,7 +68,7 @@ jobs:
       - name: Output Head Ref
         id: head_ref
         run: |
-          echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT 
+          echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
 
   rebase_staging:
     needs: auto_merge
