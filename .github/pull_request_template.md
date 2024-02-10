@@ -1,9 +1,14 @@
-## Change Summary
+## Summary
 
-Summarise your changes in points
-
+### Description
 -
 -
+-
+
+### Jira Ticket Links
+-
+
+### PR Links
 -
 
 ## Type of change
@@ -13,18 +18,9 @@ Summarise your changes in points
 - [ ] Code refactoring (restructing existing code without changing any functionality)
 - [ ] This change requires a documentation update
 
-## Documentation/Release Plan
-
-- [Problem Statement doc]()
-- [Feature documentation]()
-- [Release plan]()
-
 ## Testing Checklist
 
 Changes tested on
 - [ ] development
-- [ ] production
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)
-
----
