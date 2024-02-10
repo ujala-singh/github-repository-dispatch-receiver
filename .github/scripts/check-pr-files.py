@@ -39,13 +39,13 @@ def check_empty_fields(field_paths):
         if "jira" in field_path:
             with open(field_path, 'r') as file:
                 content = file.read()
-                if "atlanhq.atlassian.net" not in content:
+                if "ujala-singh.atlassian.net" not in content:
                     if field_name not in empty_fields:
                         empty_fields.append(field_name)
         elif "pr_link" in field_path:
             with open(field_path, 'r') as file:
                 content = file.read()
-                if "github.com/atlanhq" not in content:
+                if "github.com/ujala-singh" not in content:
                     if field_name not in empty_fields:
                         empty_fields.append(field_name)
     return empty_fields
