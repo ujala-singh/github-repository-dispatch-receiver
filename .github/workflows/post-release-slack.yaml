@@ -22,6 +22,16 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
 
+      - name: Output Head Ref
+        id: head_ref
+        run: |
+          echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+
       - name: Run Script to Post Release Message
         run: |
-          python ./.github/scripts/post-script.py "example-app-1" /tmp/description.txt /tmp/jira.txt /tmp/pr_link.txt ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
+          regex="^main-branch-update-from-.*-values$"
+          if [[ "${{ steps.head_ref.outputs.pr_head_ref }}" =~ $regex ]]; then
+            python ./.github/scripts/post-script.py "${{ steps.head_ref.outputs.pr_head_ref }}" /tmp/description.txt /tmp/jira.txt /tmp/pr_link.txt ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
+          else
+            python ./.github/scripts/post-script.py "" /tmp/description.txt /tmp/jira.txt /tmp/pr_link.txt ${{ secrets.SLACK_WEBHOOK_URL }} "${{ github.event.pull_request.html_url }}"
+          fi
