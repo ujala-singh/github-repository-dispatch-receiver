@@ -21,6 +21,6 @@
 ## Testing Checklist
 
 Changes tested on
-- [ ] development
+- [ ] beta (if applicable)
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)

@@ -17,7 +17,7 @@ jobs:
 
       - name: Run Script to Extract Fields
         run: |
-          bash ./.github/scripts/extract_fields.sh "${{ github.event.pull_request.body }}"
+          bash ./.github/scripts/extract-fields.sh "${{ github.event.pull_request.body }}"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
         shell: bash
