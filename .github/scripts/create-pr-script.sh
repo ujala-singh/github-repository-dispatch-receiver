@@ -23,6 +23,7 @@ create_body_file() {
 ### Jira Ticket Links
 
 ### PR Links
+- $PR_URL
 
 ## Type of change
 
