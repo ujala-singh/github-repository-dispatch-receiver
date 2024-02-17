@@ -41,6 +41,30 @@ EOF
   echo "$BODY_FILE"
 }
 
+# Function to push
+commit_values() {
+  # Switch to the 'main' branch
+  git checkout main
+  git pull origin main  # Make sure local 'main' is up to date with the remote
+
+  # Switch to the new branch
+  git checkout -b $NEW_BRANCH
+
+  # Check if the branch exists remotely
+  if git show-ref --verify --quiet "refs/remotes/origin/$NEW_BRANCH"; then
+    git pull origin $NEW_BRANCH --rebase  # Use rebase to reconcile divergent branches
+  fi
+
+  latest_commit_id=$(git log --format='%H' --grep="^Updating the Image Tag for $SERVICE_REPO_NAME$" -n 1 staging)
+  echo "Latest Commit Hash: $latest_commit_id"
+  echo "Cherry Pick Commit to main-branch-update-from-${SERVICE_REPO_NAME}-values"
+  # resolving conflicts in favor of the changes from latest commit
+  git cherry-pick --strategy-option=theirs $latest_commit_id
+  git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
+  echo "Pushing the changes to $NEW_BRANCH..."
+  git push origin $NEW_BRANCH --force  # Force push after rebasing
+}
+
 # Function to update the PR body with the new PR URL
 update_pr_body_and_commit() {
   local pr_number="$1"
@@ -53,53 +77,13 @@ update_pr_body_and_commit() {
   NEW_BODY=$(cat existing-pr-body.txt)
   echo "After Sed:"
   cat existing-pr-body.txt
-  # Switch to the 'main' branch
-  git checkout main
-  git pull origin main  # Make sure local 'main' is up to date with the remote
-
-  # Switch to the new branch
-  git checkout -b $NEW_BRANCH
-
-  # Check if the branch exists remotely
-  if git show-ref --verify --quiet "refs/remotes/origin/$NEW_BRANCH"; then
-    git pull origin $NEW_BRANCH --rebase  # Use rebase to reconcile divergent branches
-  fi
-
-  latest_commit_id=$(git log --format='%H' --grep="^Updating the Image Tag for $SERVICE_REPO_NAME$" -n 1 staging)
-  echo "Latest Commit Hash: $latest_commit_id"
-  echo "Cherry Pick Commit to main-branch-update-from-${SERVICE_REPO_NAME}-values"
-  # resolving conflicts in favor of the changes from latest commit
-  git cherry-pick --strategy-option=theirs $latest_commit_id
-  git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
-  echo "Pushing the changes to $NEW_BRANCH..."
-  git push origin $NEW_BRANCH --force  # Force push after rebasing
-
+  commit_values
   gh pr edit $pr_number --body "$NEW_BODY"
 }
 
 # Function to create the main branch PR
 create_main_branch_pr() {
-  # Switch to the 'main' branch
-  git checkout main
-  git pull origin main  # Make sure local 'main' is up to date with the remote
-
-  # Switch to the new branch
-  git checkout -b $NEW_BRANCH
-
-  # Check if the branch exists remotely
-  if git show-ref --verify --quiet "refs/remotes/origin/$NEW_BRANCH"; then
-    git pull origin $NEW_BRANCH --rebase  # Use rebase to reconcile divergent branches
-  fi
-
-  latest_commit_id=$(git log --format='%H' --grep="^Updating the Image Tag for $SERVICE_REPO_NAME$" -n 1 staging)
-  echo "Latest Commit Hash: $latest_commit_id"
-  echo "Cherry Pick Commit to main-branch-update-from-${SERVICE_REPO_NAME}-values"
-  # resolving conflicts in favor of the changes from latest commit
-  git cherry-pick --strategy-option=theirs $latest_commit_id
-  git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
-  echo "Pushing the changes to $NEW_BRANCH..."
-  git push origin $NEW_BRANCH --force  # Force push after rebasing
-
+  commit_values
   echo "Creating the PR to main branch with branch name as $NEW_BRANCH..."
   gh pr create --base main --head $NEW_BRANCH --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)"
 }
@@ -116,16 +100,17 @@ NEW_BRANCH="main-branch-update-from-${SERVICE_REPO_NAME}-values"
 URL="https://api.github.com/repos/ujala-singh/github-repository-dispatch-receiver/pulls?head=ujala-singh:${NEW_BRANCH}"
 # Send a GET request to the GitHub API with authentication and store the response
 response=$(curl -sSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.v3+json" "${URL}")
+is_open=$(echo "${response}" | jq -r '.[0].state')
 # Check if the response is empty (no PRs for the branch)
-if [ -z "${response}" ]; then
-  # Create a new PR with the provided body content
-  create_main_branch_pr
-else
+if [ "$is_open" == "open"  ]; then
   # Extract the PR number from the first PR in the response using jq
   pr_number=$(echo "${response}" | jq -r '.[0].number')
   echo "Pull request found for branch '${NEW_BRANCH}' with PR number ${pr_number}"
   # Update the existing PR body with the new PR URL
   update_pr_body_and_commit $pr_number
+else
+  # Create a new PR with the provided body content
+  create_main_branch_pr
 fi
 
 cleanup_temp_files "$BODY_FILE"
