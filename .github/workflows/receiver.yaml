@@ -12,6 +12,7 @@ jobs:
       service_repo_name: ${{ steps.extract_service_repo_name.outputs.service_repo_name }}
       branch_name: ${{ steps.get_branch.outputs.branch }}
       image_tag: ${{ steps.get_image_tag.outputs.image_tag }}
+      service_pr_url: ${{ steps.extract_service_pr_url.outputs.service_pr_url }}
     steps:
       - name: An event received
         id: extract_service_repo_name
@@ -21,6 +22,14 @@ jobs:
         run: |
           echo "This Workflow got triggered from the repo: https://github.com/ujala-singh/$REPO_NAME and branch: $BRANCH_NAME."
           echo "service_repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+
+      - name: Extract Service PR url
+        id: extract_service_pr_url
+        env:
+          PR_URL: ${{ github.event.client_payload.repo.pr_number }}
+        run: |
+          echo "Service PR URL: $PR_URL"
+          echo "service_pr_url=$PR_URL" >> $GITHUB_OUTPUT
       
       - name: Check if branch is master
         id: check_branch
@@ -156,6 +165,6 @@ jobs:
 
       - name: Create Main Branch PR
         run: |
-          bash ./.github/scripts/create-pr-script-on-values.sh ${{ needs.dispatch-receiver.outputs.service_repo_name }} ${{ needs.dispatch-receiver.outputs.image_tag }}
+          bash ./.github/scripts/create-pr-script-on-values.sh ${{ needs.dispatch-receiver.outputs.service_repo_name }} ${{ needs.dispatch-receiver.outputs.image_tag }} ${{ needs.dispatch-receiver.outputs.service_pr_url }}
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}

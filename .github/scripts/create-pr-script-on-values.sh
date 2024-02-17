@@ -3,6 +3,7 @@
 echo "Starting workflow..."
 SERVICE_REPO_NAME="$1"
 IMAGE_TAG="$2"
+SERVICE_PR_URL="$3"
 
 # Function to create the body content and save it to a file
 create_body_file() {
@@ -20,6 +21,7 @@ create_body_file() {
 ### Jira Ticket Links
 
 ### PR Links
+- $SERVICE_PR_URL
 
 ## Type of change
 
@@ -37,6 +39,15 @@ Changes tested on
 EOF
 
   echo "$BODY_FILE"
+}
+
+# Function to update the PR body with the new PR URL
+update_pr_body() {
+  local PR_URL="$1"
+  local BODY_FILE="$2"
+
+  # Add the new PR URL to the existing body content
+  sed -i "s/^### PR Links$/### PR Links\n- $PR_URL/" "$BODY_FILE"
 }
 
 # Function to create the main branch PR
@@ -74,7 +85,16 @@ cleanup_temp_files() {
 }
 
 BODY_FILE="$(create_body_file)"
-create_main_branch_pr
+
+# Check if the PR already exists for the branch
+if gh pr view --state open --json number -B main-branch-update-from-"$SERVICE_REPO_NAME"-values &> /dev/null; then
+  # Update the existing PR body with the new PR URL
+  update_pr_body "$SERVICE_PR_URL" "$BODY_FILE"
+else
+  # Create a new PR with the provided body content
+  create_main_branch_pr
+fi
+
 cleanup_temp_files "$BODY_FILE"
 
 echo "Workflow completed successfully."
