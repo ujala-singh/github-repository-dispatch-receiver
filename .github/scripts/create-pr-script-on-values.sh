@@ -48,8 +48,11 @@ update_pr_body_and_commit() {
   gh pr view $pr_number --json body | jq -r '.body' > existing-pr-body.txt
   cat existing-pr-body.txt
   # Add the new PR URL to the existing body content
-  sed -i '' "s|### PR Links|### PR Links\n- $SERVICE_PR_URL|g" existing-pr-body.txt
+  echo "Running Sed:"
+  sed -i "s|### PR Links|### PR Links\n- $SERVICE_PR_URL|g" existing-pr-body.txt
   NEW_BODY=$(cat existing-pr-body.txt)
+  echo "After Sed:"
+  cat existing-pr-body.txt
   # Switch to the 'main' branch
   git checkout main
   git pull origin main  # Make sure local 'main' is up to date with the remote
@@ -70,6 +73,7 @@ update_pr_body_and_commit() {
   git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
   echo "Pushing the changes to $NEW_BRANCH..."
   git push origin $NEW_BRANCH --force  # Force push after rebasing
+
   gh pr edit $pr_number --body "$NEW_BODY"
 }
 
