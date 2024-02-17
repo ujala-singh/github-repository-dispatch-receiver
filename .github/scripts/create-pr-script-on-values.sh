@@ -46,8 +46,9 @@ update_pr_body_and_commit() {
   local pr_number="$1"
   # Get the Existing Body Of the PR
   gh pr view $pr_number --json body | jq -r '.body' > existing-pr-body.txt
+  cat existing-pr-body.txt
   # Add the new PR URL to the existing body content
-  sed -i '' "s/### PR Links/### PR Links\n- $SERVICE_PR_URL/g" existing-pr-body.txt
+  sed -i '' "s|### PR Links|### PR Links\n- $SERVICE_PR_URL|g" existing-pr-body.txt
   NEW_BODY=$(cat existing-pr-body.txt)
   # Switch to the 'main' branch
   git checkout main
@@ -118,7 +119,7 @@ if [ -z "${response}" ]; then
 else
   # Extract the PR number from the first PR in the response using jq
   pr_number=$(echo "${response}" | jq -r '.[0].number')
-  echo "Pull request found for branch '${BRANCH}' with PR number ${pr_number}"
+  echo "Pull request found for branch '${NEW_BRANCH}' with PR number ${pr_number}"
   # Update the existing PR body with the new PR URL
   update_pr_body_and_commit $pr_number
 fi
