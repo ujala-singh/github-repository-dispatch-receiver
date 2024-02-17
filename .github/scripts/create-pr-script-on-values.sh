@@ -42,17 +42,38 @@ EOF
 }
 
 # Function to update the PR body with the new PR URL
-update_pr_body() {
-  local PR_URL="$1"
-  local BODY_FILE="$2"
-
+update_pr_body_and_commit() {
+  local pr_number="$1"
+  # Get the Existing Body Of the PR
+  gh pr view $pr_number --json body | jq -r '.body' > existing-pr-body.txt
   # Add the new PR URL to the existing body content
-  sed -i "s/^### PR Links$/### PR Links\n- $PR_URL/" "$BODY_FILE"
+  sed -i '' "s/### PR Links/### PR Links\n- $SERVICE_PR_URL/g" existing-pr-body.txt
+  NEW_BODY=$(cat existing-pr-body.txt)
+  # Switch to the 'main' branch
+  git checkout main
+  git pull origin main  # Make sure local 'main' is up to date with the remote
+
+  # Switch to the new branch
+  git checkout -b $NEW_BRANCH
+
+  # Check if the branch exists remotely
+  if git show-ref --verify --quiet "refs/remotes/origin/$NEW_BRANCH"; then
+    git pull origin $NEW_BRANCH --rebase  # Use rebase to reconcile divergent branches
+  fi
+
+  latest_commit_id=$(git log --format='%H' --grep="^Updating the Image Tag for $SERVICE_REPO_NAME$" -n 1 staging)
+  echo "Latest Commit Hash: $latest_commit_id"
+  echo "Cherry Pick Commit to main-branch-update-from-${SERVICE_REPO_NAME}-values"
+  # resolving conflicts in favor of the changes from latest commit
+  git cherry-pick --strategy-option=theirs $latest_commit_id
+  git commit --amend -m "Updating the Image Tag for $SERVICE_REPO_NAME ($(TZ='Asia/Kolkata' date +'%H:%M'))"
+  echo "Pushing the changes to $NEW_BRANCH..."
+  git push origin $NEW_BRANCH --force  # Force push after rebasing
+  gh pr edit $pr_number --body "$NEW_BODY"
 }
 
 # Function to create the main branch PR
 create_main_branch_pr() {
-  NEW_BRANCH="main-branch-update-from-${SERVICE_REPO_NAME}-values"
   # Switch to the 'main' branch
   git checkout main
   git pull origin main  # Make sure local 'main' is up to date with the remote
@@ -85,14 +106,21 @@ cleanup_temp_files() {
 }
 
 BODY_FILE="$(create_body_file)"
-
+NEW_BRANCH="main-branch-update-from-${SERVICE_REPO_NAME}-values"
 # Check if the PR already exists for the branch
-if gh pr view --state open --json number -B main-branch-update-from-"$SERVICE_REPO_NAME"-values &> /dev/null; then
-  # Update the existing PR body with the new PR URL
-  update_pr_body "$SERVICE_PR_URL" "$BODY_FILE"
-else
+URL="https://api.github.com/repos/ujala-singh/github-repository-dispatch-receiver/pulls?head=ujala-singh:${NEW_BRANCH}"
+# Send a GET request to the GitHub API with authentication and store the response
+response=$(curl -sSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.v3+json" "${URL}")
+# Check if the response is empty (no PRs for the branch)
+if [ -z "${response}" ]; then
   # Create a new PR with the provided body content
   create_main_branch_pr
+else
+  # Extract the PR number from the first PR in the response using jq
+  pr_number=$(echo "${response}" | jq -r '.[0].number')
+  echo "Pull request found for branch '${BRANCH}' with PR number ${pr_number}"
+  # Update the existing PR body with the new PR URL
+  update_pr_body_and_commit $pr_number
 fi
 
 cleanup_temp_files "$BODY_FILE"
