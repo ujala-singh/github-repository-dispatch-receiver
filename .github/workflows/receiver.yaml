@@ -163,8 +163,16 @@ jobs:
           git checkout staging
           git pull origin staging
 
+      - name: Parse reviewers mapping YAML
+        id: parse_reviewers_mapping
+        env:
+          service_repo_name: ${{ needs.dispatch-receiver.outputs.service_repo_name }}
+        run: |
+          reviewers_mapping=$(cat reviewers-map.yaml | yq -r ".\"$service_repo_name\"[]" | tr '\n' ',' | sed 's/,$//')
+          echo "reviewers_mapping=$reviewers_mapping" >> $GITHUB_OUTPUT
+
       - name: Create Main Branch PR
         run: |
-          bash ./.github/scripts/create-pr-script-on-values.sh ${{ needs.dispatch-receiver.outputs.service_repo_name }} ${{ needs.dispatch-receiver.outputs.image_tag }} ${{ needs.dispatch-receiver.outputs.service_pr_url }}
+          bash ./.github/scripts/create-pr-script-on-values.sh ${{ needs.dispatch-receiver.outputs.service_repo_name }} ${{ needs.dispatch-receiver.outputs.image_tag }} ${{ needs.dispatch-receiver.outputs.service_pr_url }} ${{ steps.parse_reviewers_mapping.outputs.reviewers_mapping }}
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}

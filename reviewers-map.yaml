@@ -1,0 +1,19 @@
+# reviewers_mapping.yaml
+
+github-repository-dispatcher-service1:
+  - ujala-singh
+  - ankit3yz
+
+github-repository-dispatcher-service2:
+  - ujala-singh
+  - ism2015
+  - jolly3697
+  - ankit3yz
+
+github-repository-dispatcher-service3:
+  - ujala-singh
+  - jolly3697
+
+github-repository-dispatcher-service4:
+  - ujala-singh
+  - ankit3yz

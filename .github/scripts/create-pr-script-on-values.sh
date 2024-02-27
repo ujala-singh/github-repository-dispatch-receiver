@@ -4,6 +4,7 @@ echo "Starting workflow..."
 SERVICE_REPO_NAME="$1"
 IMAGE_TAG="$2"
 SERVICE_PR_URL="$3"
+PR_REVIEWERS="$4"
 
 # Function to create the body content and save it to a file
 create_body_file() {
@@ -85,7 +86,8 @@ update_pr_body_and_commit() {
 create_main_branch_pr() {
   commit_values
   echo "Creating the PR to main branch with branch name as $NEW_BRANCH..."
-  gh pr create --base main --head $NEW_BRANCH --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)"
+  PR_CREATE_OUTPUT=$(gh pr create --base main --head $NEW_BRANCH --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)")
+  gh pr edit $PR_CREATE_OUTPUT --add-reviewer $PR_REVIEWERS
 }
 
 # Function to clean up temporary files
