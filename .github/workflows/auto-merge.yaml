@@ -48,9 +48,8 @@ jobs:
         id: extract_service_repo_name
         continue-on-error: true
         run: |
-          head_ref="${{ steps.head_ref.outputs.pr_head_ref }}"
-          regex="^main-branch-update-from-.*-values$"
-          if [[ $head_ref =~ $regex ]]; then
+          regex="^main-branch-update-from-(.*)-values$"
+          if [[ "${{ steps.head_ref.outputs.pr_head_ref }}" =~ $regex ]]; then
             service_repo_name="${BASH_REMATCH[1]}"
             echo "SERVICE REPO Name: $service_repo_name"
             echo "service_repo_name=$service_repo_name" >> $GITHUB_OUTPUT
@@ -81,7 +80,7 @@ jobs:
           service_reviewers="${{ steps.parse_reviewers_mapping.outputs.reviewers_mapping }}"
           if [[ -n "$review_users" ]]; then
             for user in $review_users; do
-              echo "Checking code owner for reviewer: $user"
+              echo "Checking code owner or service owner for reviewer: $user"
               # Check if the reviewer is a code owner
               if echo "$CODEOWNERS_CONTENT" | grep -q "$user"; then
                 echo "PR has been approved by code owner, merging..."
