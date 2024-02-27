@@ -90,7 +90,7 @@ jobs:
               elif [[ "$service_reviewers" =~ (^|,)$user($|,) ]]; then
                 echo "PR has been approved by service owner, merging..."
                 gh pr edit $pr_number --add-label "service-owner-approved"
-                gh pr merge $pr_number --squash --delete-branch
+                gh pr merge $pr_number --auto --squash --delete-branch
                 break  # Exit the loop if any reviewer is a service owner
               else
                 echo "Reviewer $user is not a code owner or service owner."
