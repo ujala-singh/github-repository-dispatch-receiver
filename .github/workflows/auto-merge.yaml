@@ -39,6 +39,34 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
 
+      - name: Output Head Ref
+        id: head_ref
+        run: |
+          echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+
+      - name: Extract SERVICE_REPO_NAME from head ref
+        id: extract_service_repo_name
+        continue-on-error: true
+        run: |
+          head_ref="${{ steps.head_ref.outputs.pr_head_ref }}"
+          regex="^main-branch-update-from-.*-values$"
+          if [[ $head_ref =~ $regex ]]; then
+            service_repo_name="${BASH_REMATCH[1]}"
+            echo "service_repo_name=${service_repo_name}" >> $GITHUB_OUTPUT
+          else
+            echo "Its not an image tag update."
+            exit 1
+          fi
+
+      - name: Parse reviewers mapping YAML
+        id: parse_reviewers_mapping
+        if: steps.extract_service_repo_name.outcome == 'success'
+        env:
+          service_repo_name: ${{ steps.extract_service_repo_name.outputs.service_repo_name }}
+        run: |
+          reviewers_mapping=$(cat reviewers-map.yaml | yq -r ".\"$service_repo_name\"[]" | tr '\n' ',' | sed 's/,$//')
+          echo "reviewers_mapping=$reviewers_mapping" >> $GITHUB_OUTPUT
+
       - name: Auto Merge Approved PR
         id: auto_merge_pr
         run: |
@@ -47,6 +75,8 @@ jobs:
           # Fetch CODEOWNERS file content
           CODEOWNERS_CONTENT=$(curl -s "https://api.github.com/repos${{ github.owner }}/${{ github.repository }}/contents/.github/CODEOWNERS" | jq -r '.content' | base64 -d)
 
+          # Fetch service owners reviewers based on the service repo name
+          service_reviewers="${{ steps.parse_reviewers_mapping.outputs.reviewers_mapping }}"
           if [[ -n "$review_users" ]]; then
             for user in $review_users; do
               echo "Checking code owner for reviewer: $user"
@@ -56,19 +86,19 @@ jobs:
                 gh pr edit $pr_number --add-label "codeowner-approved"
                 gh pr merge $pr_number --auto --squash --delete-branch
                 break  # Exit the loop if any reviewer is a code owner
+              elif [[ "$service_reviewers" =~ (^|,)$user($|,) ]]; then
+                echo "PR has been approved by service owner, merging..."
+                gh pr edit $pr_number --add-label "service-owner-approved"
+                gh pr merge $pr_number --auto --squash --delete-branch
+                break  # Exit the loop if any reviewer is a service owner
               else
-                echo "Reviewer $user is not a code owner."
+                echo "Reviewer $user is not a code owner or service owner."
               fi
             done
           fi
           echo "pr_number=$pr_number" >> $GITHUB_OUTPUT 
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
-
-      - name: Output Head Ref
-        id: head_ref
-        run: |
-          echo "pr_head_ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
 
   rebase_staging:
     needs: auto_merge
