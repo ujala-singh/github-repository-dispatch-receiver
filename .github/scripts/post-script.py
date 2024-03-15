@@ -6,7 +6,15 @@ def extract_service_name(branch_name):
     regex = r"^main-branch-update-from-(.*)-values$"
     match = re.match(regex, branch_name)
     if match:
-        return match.group(1)
+        service_name = match.group(1)
+        service_map = {
+            "github-repository-dispatcher-service1": "Service1 Repo",
+            "github-repository-dispatcher-service2": "Service2 Repo",
+            "github-repository-dispatcher-service3": "Service3 Repo",
+            "github-repository-dispatcher-service4": "Service4 Repo"
+            # Add more mappings as needed
+        }
+        return service_map.get(service_name, "Receiver Helm Repo")
     else:
         return "Receiver Helm Repo"
 
