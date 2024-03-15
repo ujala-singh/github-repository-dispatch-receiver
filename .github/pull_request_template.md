@@ -1,5 +1,7 @@
 ## Summary
 
+Description, Jira Ticket Links and PR Links Fields are mandatory.
+---
 ### Description
 -
 -
@@ -21,6 +23,6 @@
 ## Testing Checklist
 
 Changes tested on
-- [ ] beta (if applicable)
+- [ ] staging, beta (if applicable)
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)

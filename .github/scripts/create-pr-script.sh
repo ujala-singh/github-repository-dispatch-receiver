@@ -15,6 +15,8 @@ create_body_file() {
   cat <<EOF > "$BODY_FILE"
 ## Summary
 
+Description, Jira Ticket Links and PR Links Fields are mandatory.
+---
 ### Description
 
 - This PR includes changes from staging PR: $PR_URL

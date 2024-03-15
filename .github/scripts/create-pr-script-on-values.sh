@@ -14,6 +14,8 @@ create_body_file() {
   cat <<EOF > "$BODY_FILE"
 ## Summary
 
+Description, Jira Ticket Links and PR Links Fields are mandatory.
+---
 ### Description
 
 - Image Tag Update: "$SERVICE_REPO_NAME"
