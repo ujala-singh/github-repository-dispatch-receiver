@@ -83,8 +83,6 @@ update_pr_body_and_commit() {
   cat existing-pr-body.txt
   commit_values
   gh pr edit $pr_number --body "$NEW_BODY"
-  # PR_URL="https://github.com/ujala-singh/github-repository-dispatch-receiver/pull/$pr_number"
-  # gh pr comment $PR_URL --body "Hey @$SERVICE_PR_USER, your main branch PR has been automatically created. In order to merge the PR, Please test your changes on staging (pre-prod) and update the change summary and checks accordingly (Don't forget to add the JIRA Ticket)."
 }
 
 # Function to create the main branch PR
@@ -93,9 +91,6 @@ create_main_branch_pr() {
   echo "Creating the PR to main branch with branch name as $NEW_BRANCH..."
   PR_CREATE_OUTPUT=$(gh pr create --base main --head $NEW_BRANCH --title "Merge changes from 'staging' to 'main' (Update Image Tags for $SERVICE_REPO_NAME)" --body "$(cat $BODY_FILE)")
   gh pr edit $PR_CREATE_OUTPUT --add-reviewer $PR_REVIEWERS
-  # Add your comment using gh
-  # echo "PR USER: $SERVICE_PR_USER"
-  # gh pr comment $PR_CREATE_OUTPUT --body "Hey @$SERVICE_PR_USER, your main branch PR has been automatically created. In order to merge the PR, Please test your changes on staging (pre-prod) and update the change summary and checks accordingly (Don't forget to add the JIRA Ticket)."
 }
 
 # Function to clean up temporary files
