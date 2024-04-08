@@ -25,7 +25,7 @@ Description, Jira Ticket Links and PR Links Fields are mandatory.
 ### Jira Ticket Links
 
 ### PR Links
-- PR Owner: @$SERVICE_PR_USER, PR Link: $SERVICE_PR_URL
+- PR Owner: @$SERVICE_PR_USER, Microservice PR Link: $SERVICE_PR_URL
 
 ## Type of change
 

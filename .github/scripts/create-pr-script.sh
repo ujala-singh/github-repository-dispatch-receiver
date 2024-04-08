@@ -25,7 +25,7 @@ Description, Jira Ticket Links and PR Links Fields are mandatory.
 ### Jira Ticket Links
 
 ### PR Links
-- $PR_URL
+- PR Owner: @$PR_USER, Atlan Preprod PR Link: $PR_URL
 
 ## Type of change
 
