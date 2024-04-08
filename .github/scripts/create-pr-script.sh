@@ -19,13 +19,13 @@ Description, Jira Ticket Links and PR Links Fields are mandatory.
 ---
 ### Description
 
-- This PR includes changes from staging PR: $PR_URL
+- This PR includes changes from staging PR:- $PR_URL
 -
 
 ### Jira Ticket Links
 
 ### PR Links
-- PR Owner: @$PR_USER, Atlan Preprod PR Link: $PR_URL
+- PR Owner:- @$PR_USER, Atlan Preprod PR Link:- $PR_URL
 
 ## Type of change
 

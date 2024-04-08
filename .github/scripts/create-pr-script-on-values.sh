@@ -19,13 +19,13 @@ Description, Jira Ticket Links and PR Links Fields are mandatory.
 ---
 ### Description
 
-- Image Tag Update: "$SERVICE_REPO_NAME"
+- Image Tag Update:- "$SERVICE_REPO_NAME"
 -
 
 ### Jira Ticket Links
 
 ### PR Links
-- PR Owner: @$SERVICE_PR_USER, Microservice PR Link: $SERVICE_PR_URL
+- PR Owner:- @$SERVICE_PR_USER, Microservice PR Link:- $SERVICE_PR_URL
 
 ## Type of change
 
@@ -77,7 +77,7 @@ update_pr_body_and_commit() {
   cat existing-pr-body.txt
   # Add the new PR URL to the existing body content
   echo "Running Sed:"
-  sed -i "s|### PR Links|### PR Links\n- PR Owner: @$SERVICE_PR_USER, PR Link: $SERVICE_PR_URL|g" existing-pr-body.txt
+  sed -i "s|### PR Links|### PR Links\n- PR Owner:- @$SERVICE_PR_USER, PR Link:- $SERVICE_PR_URL|g" existing-pr-body.txt
   NEW_BODY=$(cat existing-pr-body.txt)
   echo "After Sed:"
   cat existing-pr-body.txt

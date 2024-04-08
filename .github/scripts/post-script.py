@@ -44,7 +44,7 @@ def post_to_slack(service_name, description, jira, pr_links, pr_url, webhook_url
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"*Service: {service_name}*\n*Description:*\n{description_bullet_points}\n*Jira:*\n{jira_bullet_points}\n*Pull Requests:*\n{pr_bullet_points}\n• {pr_url}"
+                    "text": f"*Service: {service_name}*\n*Description:*\n{description_bullet_points}\n*Jira:*\n{jira_bullet_points}\n*Pull Requests:*\n{pr_bullet_points}\n• Atlan Main PR:- {pr_url}"
                 }
             }
         ]
