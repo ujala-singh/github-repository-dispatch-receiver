@@ -25,7 +25,7 @@ Description, Jira Ticket Links and PR Links Fields are mandatory.
 ### Jira Ticket Links
 
 ### PR Links
-- $SERVICE_PR_URL, Owner: $PR_USER
+- $SERVICE_PR_URL, Owner: @$PR_USER
 
 ## Type of change
 
@@ -41,8 +41,6 @@ Changes tested on
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)
 EOF
-
-  echo "$BODY_FILE"
 }
 
 # Function to push
@@ -100,6 +98,7 @@ cleanup_temp_files() {
 }
 
 BODY_FILE="$(create_body_file)"
+echo "$BODY_FILE"
 NEW_BRANCH="main-branch-update-from-${SERVICE_REPO_NAME}-values"
 # Check if the PR already exists for the branch
 URL="https://api.github.com/repos/ujala-singh/github-repository-dispatch-receiver/pulls?head=ujala-singh:${NEW_BRANCH}"
