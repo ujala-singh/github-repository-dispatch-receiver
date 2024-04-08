@@ -4,7 +4,8 @@ echo "Starting workflow..."
 SERVICE_REPO_NAME="$1"
 IMAGE_TAG="$2"
 SERVICE_PR_URL="$3"
-PR_REVIEWERS="$4"
+PR_USER="$4"
+PR_REVIEWERS="$5"
 
 # Function to create the body content and save it to a file
 create_body_file() {
@@ -24,7 +25,7 @@ Description, Jira Ticket Links and PR Links Fields are mandatory.
 ### Jira Ticket Links
 
 ### PR Links
-- $SERVICE_PR_URL
+- $SERVICE_PR_URL, Owner: $PR_USER
 
 ## Type of change
 
@@ -76,7 +77,7 @@ update_pr_body_and_commit() {
   cat existing-pr-body.txt
   # Add the new PR URL to the existing body content
   echo "Running Sed:"
-  sed -i "s|### PR Links|### PR Links\n- $SERVICE_PR_URL|g" existing-pr-body.txt
+  sed -i "s|### PR Links|### PR Links\n- $SERVICE_PR_URL, Owner: $PR_USER|g" existing-pr-body.txt
   NEW_BODY=$(cat existing-pr-body.txt)
   echo "After Sed:"
   cat existing-pr-body.txt
