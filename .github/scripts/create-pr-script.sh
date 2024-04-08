@@ -41,8 +41,6 @@ Changes tested on
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)
 EOF
-
-  echo "$BODY_FILE"
 }
 
 # Function to create the main branch PR
@@ -78,6 +76,7 @@ cleanup_temp_files() {
 }
 
 BODY_FILE="$(create_body_file "$PR_NUMBER" "$PR_URL")"
+echo "$BODY_FILE"
 create_main_branch_pr "$PR_NUMBER" "$BODY_FILE" "$PR_USER"
 cleanup_temp_files "$BODY_FILE"
 
