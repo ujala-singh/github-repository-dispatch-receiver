@@ -41,6 +41,8 @@ Changes tested on
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)
 EOF
+
+  echo "$BODY_FILE"
 }
 
 # Function to create the main branch PR

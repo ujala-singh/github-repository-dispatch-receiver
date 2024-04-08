@@ -25,7 +25,7 @@ Description, Jira Ticket Links and PR Links Fields are mandatory.
 ### Jira Ticket Links
 
 ### PR Links
-- $SERVICE_PR_URL, Owner: @$PR_USER
+- $SERVICE_PR_URL, Owner: $PR_USER
 
 ## Type of change
 
@@ -41,6 +41,8 @@ Changes tested on
 - [ ] [MABL Tests Link]() (if any)
 - [ ] [Successful Workflow Links]() (if any)
 EOF
+
+  echo "$BODY_FILE"
 }
 
 # Function to push
