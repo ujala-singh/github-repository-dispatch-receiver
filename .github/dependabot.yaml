@@ -9,8 +9,4 @@ updates:
     allow:
       # Allow direct and indirect updates for all packages
       - dependency-type: "all"
-    target:
-      # Specify the branches where you want Dependabot to run
-      branches:
-        - "staging"
-        - "beta"
+    target-branch: "staging"
