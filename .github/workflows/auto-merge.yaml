@@ -14,7 +14,7 @@ jobs:
       pr_head_ref: ${{ steps.head_ref.outputs.pr_head_ref }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
@@ -111,7 +111,7 @@ jobs:
           echo "Head Ref: ${{ needs.auto_merge.outputs.pr_head_ref }}"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.MY_PAT }}
           fetch-depth: 0

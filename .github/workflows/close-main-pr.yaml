@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.base.ref == 'main' && github.event.pull_request.user.login != 'ujala-singh' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
