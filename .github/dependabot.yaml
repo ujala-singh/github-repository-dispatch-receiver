@@ -1,0 +1,16 @@
+# Use `allow` to specify which dependencies to maintain
+
+version: 2
+updates:
+  - package-ecosystem: "npm" #npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      # Allow direct and indirect updates for all packages
+      - dependency-type: "all"
+    target:
+      # Specify the branches where you want Dependabot to run
+      branches:
+        - "staging"
+        - "beta"
