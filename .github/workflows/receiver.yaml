@@ -50,7 +50,7 @@ jobs:
           fi
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.MY_PAT }}
           ref: ${{ steps.check_branch.outputs.branch }}
@@ -151,7 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.dispatch-receiver.outputs.branch_name == 'staging'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
