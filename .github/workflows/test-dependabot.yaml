@@ -1,0 +1,28 @@
+name: Notify Open PRs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 10 * * *'
+
+jobs:
+  pr-summary-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.my_pat }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install PyGithub requests
+
+      - name: Run Python script
+        run: |
+          echo "Hello Dependa Bot!"

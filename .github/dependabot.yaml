@@ -13,3 +13,16 @@ updates:
       # Allow direct and indirect updates for all packages
       - dependency-type: "all"
     target-branch: "staging"
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions" #github-actions
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "fix: "
+      include: "scope"
+    allow:
+      #  Allow direct and indirect  updates for all packages
+      - dependency-type: "all"
+    target-branch: "staging"
