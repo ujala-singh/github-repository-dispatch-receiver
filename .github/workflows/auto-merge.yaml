@@ -70,6 +70,7 @@ jobs:
 
       - name: Add PR Comment with approval dismissal
         id: check_required_checks
+        continue-on-error: true
         run: |
           # Extract the PR number from the pull request
           PR_NUMBER="${{ github.event.pull_request.number }}"
@@ -79,15 +80,14 @@ jobs:
           check_name=$(echo "$line" | awk '{print $1}')
           check_status=$(echo "$line" | awk '{print $2}')
           check_url=$(echo "$line" | awk '{print $NF}')
-
+          # Dismiss the existing review
+          gh api repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews/'{}'/dismissals
           # If the check is failing, comment on the PR and break the loop
           if [ "$check_status" == "fail" ]; then
               gh pr comment $PR_NUMBER --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
               Check URL: $check_url"
+              exit 1
           fi
-          # Dismiss the existing review
-          gh api repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews/'{}'/dismissals
-          exit 1
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
