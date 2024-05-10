@@ -71,10 +71,8 @@ jobs:
       - name: Test1
         run: |
           # Extract the PR number from the pull request
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          # Get the required failed checks
-          gh pr checks $PR_NUMBER --required
-          checks_output=$(gh pr checks $PR_NUMBER --required)
+          pr_number=${{ github.event.pull_request.number }}
+          checks_output=$(gh pr checks ${pr_number} --required)
           echo "$checks_output"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
@@ -82,9 +80,9 @@ jobs:
       - name: Test2
         run: |
           # Extract the PR number from the pull request
-          PR_NUMBER="${{ github.event.pull_request.number }}"
+          pr_number=${{ github.event.pull_request.number }}
           # Get the required failed checks
-          checks_output=$(gh pr checks $PR_NUMBER --required)
+          checks_output=$(gh pr checks ${pr_number} --required)
           echo "$checks_output"
           # Extract check name, status, and URL
           check_name=$(echo "$checks_output" | awk '{print $1}')
@@ -98,9 +96,9 @@ jobs:
         id: check_required_checks
         run: |
           # Extract the PR number from the pull request
-          PR_NUMBER="${{ github.event.pull_request.number }}"
+          pr_number=${{ github.event.pull_request.number }}
           # Get the required failed checks
-          checks_output=$(gh pr checks $PR_NUMBER --required)
+          checks_output=$(gh pr checks ${pr_number} --required)
           echo "$checks_output"
           # Extract check name, status, and URL
           check_name=$(echo "$checks_output" | awk '{print $1}')
@@ -109,10 +107,10 @@ jobs:
           echo "$check_name, $check_status, $check_url"
           # If the check is failing, comment on the PR and break the loop
           if [ "$check_status" == "fail" ]; then
-              gh pr comment $PR_NUMBER --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
+              gh pr comment $pr_number --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
               Check URL: $check_url"
               # Dismiss the existing review
-              gh api repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews/'{}'/dismissals
+              gh api repos/${{ github.repository }}/pulls/$pr_number/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/$pr_number/reviews/'{}'/dismissals
           fi
           echo "check_status=$check_status" >> $GITHUB_OUTPUT
         env:
