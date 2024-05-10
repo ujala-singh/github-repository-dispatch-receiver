@@ -20,7 +20,9 @@ jobs:
           fetch-depth: 0
 
       - name: Check GitHub CLI version
-        run: gh --version
+        run: |
+          sudo apt update gh
+          gh --version
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
