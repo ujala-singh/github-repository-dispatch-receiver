@@ -83,8 +83,8 @@ jobs:
           echo "$check_name, $check_status, $check_url"
           # If the check is failing, comment on the PR and break the loop
           if [ "$check_status" == "fail" ]; then
-              gh pr comment $PR_NUMBER --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
-              Check URL: $check_url"
+              # gh pr comment $PR_NUMBER --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
+              # Check URL: $check_url"
               # Dismiss the existing review
               gh api repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews/'{}'/dismissals
           fi
