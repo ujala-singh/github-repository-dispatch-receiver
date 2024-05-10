@@ -70,7 +70,6 @@ jobs:
 
       - name: Add PR Comment with approval dismissal
         id: check_required_checks
-        continue-on-error: true
         run: |
           # Extract the PR number from the pull request
           PR_NUMBER="${{ github.event.pull_request.number }}"
@@ -88,14 +87,14 @@ jobs:
               Check URL: $check_url"
               # Dismiss the existing review
               gh api repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews/'{}'/dismissals
-              exit 1
           fi
+          echo "check_status=$check_status" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Auto Merge Approved PR
         id: auto_merge_pr
-        if: steps.check_required_checks.outcome == 'success'
+        if: steps.check_required_checks.outputs.check_status  == 'pass'
         run: |
           pr_number=${{ github.event.pull_request.number }}
           review_users=$(gh pr view ${pr_number} --json reviews | jq -r '.reviews[].author.login')
