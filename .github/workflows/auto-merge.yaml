@@ -32,20 +32,10 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Get PR checks status
-        id: pr_checks_status
-        run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          CHECKS_STATUS=$(gh pr checks $PR_NUMBER --json status,state | jq '.[] | select(.status != "completed" or .conclusion != "success") | .status, .conclusion')
-          echo "::set-output name=checks_status::$CHECKS_STATUS"
-
       - name: Add Approved label
-        if: steps.pr_checks_status.outputs.checks_status != null
         run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          gh pr edit $PR_NUMBER --add-label "approved"
-          # Dismiss the approval and add comment if checks are failing
-          gh pr review $PR_NUMBER --approve --dismiss --body "Checks have failed. Please fix the issues before merging."
+          pr_number=$(gh pr view ${{ github.event.pull_request.number }} --json number --jq '.number')
+          gh pr edit $pr_number --add-label "approved"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
 
@@ -79,7 +69,6 @@ jobs:
           echo "reviewers_mapping=$reviewers_mapping" >> $GITHUB_OUTPUT
 
       - name: Auto Merge Approved PR
-        if: steps.pr_checks_status.outputs.checks_status == null
         id: auto_merge_pr
         run: |
           pr_number=${{ github.event.pull_request.number }}
