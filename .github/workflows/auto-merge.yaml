@@ -72,7 +72,7 @@ jobs:
         run: |
           # Extract the PR number from the pull request
           pr_number=${{ github.event.pull_request.number }}
-          checks_output=$(gh pr checks ${pr_number} --required)
+          gh pr checks $pr_number --required > checks_output
           echo "$checks_output"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
@@ -82,12 +82,12 @@ jobs:
           # Extract the PR number from the pull request
           pr_number=${{ github.event.pull_request.number }}
           # Get the required failed checks
-          checks_output=$(gh pr checks ${pr_number} --required)
+          gh pr checks $pr_number --required > checks_output
           echo "$checks_output"
           # Extract check name, status, and URL
-          check_name=$(echo "$checks_output" | awk '{print $1}')
-          check_status=$(echo "$checks_output" | awk '{print $2}')
-          check_url=$(echo "$checks_output" | awk '{print $4}')
+          check_name=$(cat "$checks_output" | awk '{print $1}')
+          check_status=$(cat "$checks_output" | awk '{print $2}')
+          check_url=$(cat "$checks_output" | awk '{print $4}')
           echo "$check_name, $check_status, $check_url"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
