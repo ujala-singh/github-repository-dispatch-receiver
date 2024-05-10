@@ -68,9 +68,33 @@ jobs:
           echo "SERVICE REVIEWERS: $reviewers_mapping"
           echo "reviewers_mapping=$reviewers_mapping" >> $GITHUB_OUTPUT
 
+      - name: Add PR Comment with approval dismissal
+        id: check_required_checks
+        run: |
+          # Extract the PR number from the pull request
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          # Get the required failed checks
+          checks_output=$(gh pr checks $PR_NUMBER --required)
+          # Extract check name, status, and URL
+          check_name=$(echo "$line" | awk '{print $1}')
+          check_status=$(echo "$line" | awk '{print $2}')
+          check_url=$(echo "$line" | awk '{print $NF}')
+
+          # If the check is failing, comment on the PR and break the loop
+          if [ "$check_status" == "fail" ]; then
+              gh pr comment $PR_NUMBER --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
+              Check URL: $check_url"
+          fi
+          # Dismiss the existing review
+          gh api repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews/'{}'/dismissals
+          exit 1
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+
       - name: Auto Merge Approved PR
         id: auto_merge_pr
-        continue-on-error: true
+        if: steps.check_required_checks.outcome == 'success'
         run: |
           pr_number=${{ github.event.pull_request.number }}
           review_users=$(gh pr view ${pr_number} --json reviews | jq -r '.reviews[].author.login')
@@ -99,17 +123,6 @@ jobs:
             done
           fi
           echo "pr_number=$pr_number" >> $GITHUB_OUTPUT 
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
-      
-      - name: Add PR Comment
-        if: steps.auto_merge_pr.outcome == 'failure'
-        run: |
-          # Extract the PR number from the pull request
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-
-          # Add your comment using gh
-          gh pr comment $PR_NUMBER --body "Required Checks have failed for this PR. Please fix the issues before merging."
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
 
