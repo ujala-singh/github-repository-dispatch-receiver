@@ -81,6 +81,7 @@ jobs:
           check_name=$(echo "$checks_output" | awk '{print $1}')
           check_status=$(echo "$checks_output" | awk '{print $2}')
           check_url=$(echo "$checks_output" | awk '{print $NF}')
+          echo "$check_name, $check_status, $check_url"
           # If the check is failing, comment on the PR and break the loop
           if [ "$check_status" == "fail" ]; then
               gh pr comment $PR_NUMBER --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
