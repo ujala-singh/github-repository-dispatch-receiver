@@ -75,8 +75,10 @@ jobs:
           # Get the required failed checks
           checks_output=$(gh pr checks $PR_NUMBER --required)
           echo "$checks_output"
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
       
-      - name: Test1
+      - name: Test2
         run: |
           # Extract the PR number from the pull request
           PR_NUMBER="${{ github.event.pull_request.number }}"
@@ -88,6 +90,8 @@ jobs:
           check_status=$(echo "$checks_output" | awk '{print $2}')
           check_url=$(echo "$checks_output" | awk '{print $4}')
           echo "$check_name, $check_status, $check_url"
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Add PR Comment with approval dismissal
         id: check_required_checks
