@@ -67,6 +67,27 @@ jobs:
           reviewers_mapping=$(cat reviewers-map.yaml | yq -r ".\"$service_repo_name\"[]" | tr '\n' ',' | sed 's/,$//')
           echo "SERVICE REVIEWERS: $reviewers_mapping"
           echo "reviewers_mapping=$reviewers_mapping" >> $GITHUB_OUTPUT
+      
+      - name: Test1
+        run: |
+          # Extract the PR number from the pull request
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          # Get the required failed checks
+          checks_output=$(gh pr checks $PR_NUMBER --required)
+          echo "$checks_output"
+      
+      - name: Test1
+        run: |
+          # Extract the PR number from the pull request
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          # Get the required failed checks
+          checks_output=$(gh pr checks $PR_NUMBER --required)
+          echo "$checks_output"
+          # Extract check name, status, and URL
+          check_name=$(echo "$checks_output" | awk '{print $1}')
+          check_status=$(echo "$checks_output" | awk '{print $2}')
+          check_url=$(echo "$checks_output" | awk '{print $4}')
+          echo "$check_name, $check_status, $check_url"
 
       - name: Add PR Comment with approval dismissal
         id: check_required_checks
