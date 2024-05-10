@@ -73,7 +73,8 @@ jobs:
           # Extract the PR number from the pull request
           PR_NUMBER="${{ github.event.pull_request.number }}"
           # Get the required failed checks
-          checks_output=$(gh pr checks 260 --required)
+          gh pr checks $PR_NUMBER --required
+          checks_output=$(gh pr checks $PR_NUMBER --required)
           echo "$checks_output"
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
