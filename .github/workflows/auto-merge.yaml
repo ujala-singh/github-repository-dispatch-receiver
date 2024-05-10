@@ -70,6 +70,7 @@ jobs:
 
       - name: Auto Merge Approved PR
         id: auto_merge_pr
+        continue-on-error: true
         run: |
           pr_number=${{ github.event.pull_request.number }}
           review_users=$(gh pr view ${pr_number} --json reviews | jq -r '.reviews[].author.login')
@@ -98,6 +99,17 @@ jobs:
             done
           fi
           echo "pr_number=$pr_number" >> $GITHUB_OUTPUT 
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+      
+      - name: Add PR Comment
+        if: steps.auto_merge_pr.outcome == 'failure'
+        run: |
+          # Extract the PR number from the pull request
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          # Add your comment using gh
+          gh pr comment $PR_NUMBER --body "Required Checks have failed for this PR. Please fix the issues before merging."
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
 
