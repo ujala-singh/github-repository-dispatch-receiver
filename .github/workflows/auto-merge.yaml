@@ -76,11 +76,11 @@ jobs:
           PR_NUMBER="${{ github.event.pull_request.number }}"
           # Get the required failed checks
           checks_output=$(gh pr checks $PR_NUMBER --required)
-          echo $checks_output
+          echo "$checks_output"
           # Extract check name, status, and URL
-          check_name=$(echo "$line" | awk '{print $1}')
-          check_status=$(echo "$line" | awk '{print $2}')
-          check_url=$(echo "$line" | awk '{print $NF}')
+          check_name=$(echo "$checks_output" | awk '{print $1}')
+          check_status=$(echo "$checks_output" | awk '{print $2}')
+          check_url=$(echo "$checks_output" | awk '{print $NF}')
           # Dismiss the existing review
           gh api repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews/'{}'/dismissals
           # If the check is failing, comment on the PR and break the loop
