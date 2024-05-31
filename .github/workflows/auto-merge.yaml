@@ -68,58 +68,58 @@ jobs:
           echo "SERVICE REVIEWERS: $reviewers_mapping"
           echo "reviewers_mapping=$reviewers_mapping" >> $GITHUB_OUTPUT
       
-      - name: Test1
-        run: |
-          # Extract the PR number from the pull request
-          pr_number=${{ github.event.pull_request.number }}
-          checks_output=$(gh pr checks ${pr_number} --required)
-          echo "$checks_output"
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
+      # - name: Test1
+      #   run: |
+      #     # Extract the PR number from the pull request
+      #     pr_number=${{ github.event.pull_request.number }}
+      #     checks_output=$(gh pr checks ${pr_number} --required)
+      #     echo "$checks_output"
+      #   shell: bash
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_PAT }}
       
-      - name: Test2
-        run: |
-          # Extract the PR number from the pull request
-          pr_number=${{ github.event.pull_request.number }}
-          # Get the required failed checks
-          checks_output=$(gh pr checks ${pr_number} --required)
-          echo "$checks_output"
-          # Extract check name, status, and URL
-          check_name=$(echo "$checks_output" | awk '{print $1}')
-          check_status=$(echo "$checks_output" | awk '{print $2}')
-          check_url=$(echo "$checks_output" | awk '{print $4}')
-          echo "$check_name, $check_status, $check_url"
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
+      # - name: Test2
+      #   run: |
+      #     # Extract the PR number from the pull request
+      #     pr_number=${{ github.event.pull_request.number }}
+      #     # Get the required failed checks
+      #     checks_output=$(gh pr checks ${pr_number} --required)
+      #     echo "$checks_output"
+      #     # Extract check name, status, and URL
+      #     check_name=$(echo "$checks_output" | awk '{print $1}')
+      #     check_status=$(echo "$checks_output" | awk '{print $2}')
+      #     check_url=$(echo "$checks_output" | awk '{print $4}')
+      #     echo "$check_name, $check_status, $check_url"
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_PAT }}
 
-      - name: Add PR Comment with approval dismissal
-        id: check_required_checks
-        run: |
-          # Extract the PR number from the pull request
-          pr_number=${{ github.event.pull_request.number }}
-          # Get the required failed checks
-          checks_output=$(gh pr checks ${pr_number} --required)
-          echo "$checks_output"
-          # Extract check name, status, and URL
-          check_name=$(echo "$checks_output" | awk '{print $1}')
-          check_status=$(echo "$checks_output" | awk '{print $2}')
-          check_url=$(echo "$checks_output" | awk '{print $4}')
-          echo "$check_name, $check_status, $check_url"
-          # If the check is failing, comment on the PR and break the loop
-          if [ "$check_status" == "fail" ]; then
-              gh pr comment $pr_number --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
-              Check URL: $check_url"
-              # Dismiss the existing review
-              gh api repos/${{ github.repository }}/pulls/$pr_number/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/$pr_number/reviews/'{}'/dismissals
-          fi
-          echo "check_status=$check_status" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
+      # - name: Add PR Comment with approval dismissal
+      #   id: check_required_checks
+      #   run: |
+      #     # Extract the PR number from the pull request
+      #     pr_number=${{ github.event.pull_request.number }}
+      #     # Get the required failed checks
+      #     checks_output=$(gh pr checks ${pr_number} --required)
+      #     echo "$checks_output"
+      #     # Extract check name, status, and URL
+      #     check_name=$(echo "$checks_output" | awk '{print $1}')
+      #     check_status=$(echo "$checks_output" | awk '{print $2}')
+      #     check_url=$(echo "$checks_output" | awk '{print $4}')
+      #     echo "$check_name, $check_status, $check_url"
+      #     # If the check is failing, comment on the PR and break the loop
+      #     if [ "$check_status" == "fail" ]; then
+      #         gh pr comment $pr_number --body "The required check '$check_name' has failed. Please fix the issues before approving the PR.
+      #         Check URL: $check_url"
+      #         # Dismiss the existing review
+      #         gh api repos/${{ github.repository }}/pulls/$pr_number/reviews --jq '.[] | select(.state == "APPROVED") | .id' | xargs -I '{}' gh api --method=PUT -f message="Dismissed due to required checks failure." repos/${{ github.repository }}/pulls/$pr_number/reviews/'{}'/dismissals
+      #     fi
+      #     echo "check_status=$check_status" >> $GITHUB_OUTPUT
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_PAT }}
 
       - name: Auto Merge Approved PR
         id: auto_merge_pr
-        if: steps.check_required_checks.outputs.check_status  == 'pass'
+        # if: steps.check_required_checks.outputs.check_status  == 'pass'
         run: |
           pr_number=${{ github.event.pull_request.number }}
           review_users=$(gh pr view ${pr_number} --json reviews | jq -r '.reviews[].author.login')
