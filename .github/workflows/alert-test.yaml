@@ -22,7 +22,7 @@ jobs:
 
       - name: Exit
         run: |
-          exit 0
+          exit 1
 
       - uses: ravsamhq/notify-slack-action@v2
         if: always()
