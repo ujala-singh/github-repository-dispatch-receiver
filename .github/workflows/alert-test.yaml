@@ -24,18 +24,19 @@ jobs:
         run: |
           exit 1
 
-      - uses: ravsamhq/notify-slack-action@v2
+      - name: Notify Slack Action
+        uses: ravsamhq/notify-slack-action@v2
         if: always()
         with:
           token: ${{ secrets.MY_PAT }}
           status: ${{ job.status }}
-          notification_title: "{workflow} has {status_message} in {repo}"
+          notification_title: "{workflow} is failing"
           message_format: "{emoji} *{workflow}* {status_message} \n Workflow Run URL: {run_url}"
           footer: "Linked Repo <{repo_url}|{repo}>"
           notify_when: "failure"
           mention_users: "U06HFTZDSP9"
-          mention_users_when: "failure,warnings"
+          mention_users_when: "failure"
           # mention_groups: "SAZ94GDB8"
-          # mention_groups_when: "failure,warnings"
+          # mention_groups_when: "failure"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
