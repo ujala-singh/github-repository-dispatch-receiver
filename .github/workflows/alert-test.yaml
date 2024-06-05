@@ -65,8 +65,8 @@ jobs:
         with:
           token: ${{ secrets.MY_PAT }}
           status: ${{ job.status }}
-          notification_title: "{workflow} is failing"
-          message_format: "{emoji} Job {job} in *{workflow}* has {status_message} \n Workflow Run URL: {run_url}"
+          notification_title: "Workflow {workflow} is failing"
+          message_format: "{emoji} Job {job} in the *{workflow}* has {status_message} \n Workflow Run URL: {run_url}"
           footer: "Linked Repo <{repo_url}|{repo}>"
           notify_when: "failure"
           mention_users: "U06HFTZDSP9"
