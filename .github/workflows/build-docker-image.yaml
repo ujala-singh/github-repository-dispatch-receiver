@@ -38,5 +38,5 @@ jobs:
     
     - name: BuildAndPushImageOnHarbor
       run: |
-        docker buildx build --platform linux/amd64 -t ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.tag }} ./App
-        docker push ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ steps.version.outputs.tag }}
+        docker buildx build --platform linux/amd64 -t ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ steps.get_branch.outputs.branch }}:{{ steps.get_version.outputs.version }} ./App
+        docker push ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ steps.get_branch.outputs.branch }}:{{ steps.get_version.outputs.version }}
