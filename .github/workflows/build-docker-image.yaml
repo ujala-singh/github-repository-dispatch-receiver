@@ -36,14 +36,7 @@ jobs:
         username: ${{ secrets.HARBOR_USERNAME }}
         password: ${{ secrets.HARBOR_PASSWORD }}
     
-    - name: Build and push docker image
-      id: docker_build
-      uses: docker/build-push-action@v4.0.0
-      with:
-        context: ./App
-        file: ./Dockerfile
-        push: true
-        repository: ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}
-        tags: |
-          ${{ github.event.repository.name }}-${{ steps.get_branch.outputs.branch }}:latest
-          ${{ github.event.repository.name }}-${{ steps.get_branch.outputs.branch }}:${{ steps.get_version.outputs.version }}
+    - name: BuildAndPushImageOnHarbor
+      run: |
+        docker build ./App -t ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ steps.get_branch.outputs.branch }}:{{ steps.get_version.outputs.version }}
+        docker push ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ steps.get_branch.outputs.branch }}:{{ steps.get_version.outputs.version }}
