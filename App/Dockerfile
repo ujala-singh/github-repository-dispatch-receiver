@@ -9,7 +9,7 @@ RUN wget -qO /usr/local/bin/kubectl "https://dl.k8s.io/release/$(wget -qO- https
 RUN chmod +x /usr/local/bin/kubectl
 
 # Copy the script into the container
-COPY patch-ebs-csi-controller.sh /patch-ebs-csi-controller.sh
+COPY ./App/patch-ebs-csi-controller.sh /patch-ebs-csi-controller.sh
 
 # Set executable permissions on the script
 RUN chmod +x /patch-ebs-csi-controller.sh
