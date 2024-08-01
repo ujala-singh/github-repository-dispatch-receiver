@@ -43,4 +43,4 @@ jobs:
         context: .
         file: ./App/Dockerfile
         push: true
-        tags: ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ steps.get_branch.outputs.branch }}:{{ steps.get_version.outputs.version }}
+        tags: ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ github.event.repository.name }}-${{ steps.get_branch.outputs.branch }}
