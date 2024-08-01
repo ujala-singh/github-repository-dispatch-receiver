@@ -1,10 +1,8 @@
 #!/bin/bash
-
 # Define the function to get the current timestamp
 get_timestamp() {
     date +"%Y-%m-%d %H:%M:%S"
 }
-
 # Define the function to patch the ebs-csi-controller deployment
 patch_ebs_csi_controller() {
     # Check if the deployment exists
@@ -33,6 +31,5 @@ run_periodically() {
         sleep 300  # Sleep for 5 minutes (300 seconds)
     done
 }
-
 # Execute the function to run the patch command periodically
 run_periodically
