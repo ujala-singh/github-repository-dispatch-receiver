@@ -110,7 +110,7 @@ jobs:
 
       - name: Create Release on the repo
         id: create_release
-        uses: ncipollo/release-action@v1.13.0
+        uses: ncipollo/release-action@v1.15.0
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PAT }}
         with:
