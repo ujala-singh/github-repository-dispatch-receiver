@@ -46,8 +46,8 @@ class PRFieldValidator:
 
         # Constants
         self.MIN_DESCRIPTION_LENGTH = 120
-        self.REQUIRED_JIRA_DOMAIN = "atlanhq.atlassian.net"
-        self.REQUIRED_PR_DOMAIN = "github.com/atlanhq"
+        self.REQUIRED_JIRA_DOMAIN = "ujala-singh.atlassian.net"
+        self.REQUIRED_PR_DOMAIN = "github.com/ujala-singh"
         
         logging.info("PRFieldValidator initialized successfully")
 
