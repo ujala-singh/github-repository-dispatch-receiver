@@ -1,7 +1,3 @@
-
-
-
-
 #!/usr/bin/env python3
 """
 Pull Request Field Validator
@@ -29,14 +25,17 @@ class PRFieldValidator:
     def __init__(self):
         """
         Initialize the validator with GitHub token and required configurations.
-        
-        Args:
-            github_token (str): GitHub authentication token, defaults to GITHUB_TOKEN environment variable
         """
         self.github_token = os.environ.get("GITHUB_TOKEN")
         if not self.github_token:
             raise ValueError("GitHub token not provided. Set GITHUB_TOKEN environment variable.")
-            
+
+        # Configure logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+        )
+
         # Constants
         self.MIN_DESCRIPTION_LENGTH = 120
         self.REQUIRED_JIRA_DOMAIN = "atlanhq.atlassian.net"
@@ -55,10 +54,6 @@ class PRFieldValidator:
         warnings_list = [] 
         
         for field_path, field_name in field_paths.items():
-            # Log file sizes for debugging
-            file_size = os.path.getsize(field_path)
-            logging.info(f"Checking {field_name} ({field_path}): {file_size} bytes")
-            
             try:
                 if "description" in field_path:
                     warnings_list.extend(self._check_description(field_path))
@@ -67,31 +62,45 @@ class PRFieldValidator:
                 elif "pr_link" in field_path:
                     warnings_list.extend(self._check_pr_link(field_path))
             except Exception as e:
-                logging.error(f"Error checking {field_name}: {str(e)}")
-                warnings_list.append(f"⚠️ Error validating {field_name}: {str(e)}")
+                logging.error(f"Error validating {field_name}: {e}")
+                warnings_list.append(f"⚠️ Error validating {field_name}: {e}")
                 
         return warnings_list
     
     def _check_description(self, file_path: str) -> List[str]:
         """Check if description meets length requirements."""
-        if os.path.getsize(file_path) < self.MIN_DESCRIPTION_LENGTH:
-            return [f"⚠️ Description is less than {self.MIN_DESCRIPTION_LENGTH} characters. Consider adding more details."]
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read().strip()
+                if len(content) < self.MIN_DESCRIPTION_LENGTH:
+                    return [f"⚠️ Description is less than {self.MIN_DESCRIPTION_LENGTH} characters. Consider adding more details."]
+        except Exception as e:
+            logging.error(f"Error reading description file: {e}")
+            raise
         return []
     
     def _check_jira_link(self, file_path: str) -> List[str]:
         """Check if Jira link contains required domain."""
-        with open(file_path, 'r') as file:
-            content = file.read().strip()
-            if self.REQUIRED_JIRA_DOMAIN not in content:
-                return [f"⚠️ Jira ticket link doesn't contain '{self.REQUIRED_JIRA_DOMAIN}'. Please verify if this is correct."]
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read().strip()
+                if self.REQUIRED_JIRA_DOMAIN not in content:
+                    return [f"⚠️ Jira ticket link doesn't contain '{self.REQUIRED_JIRA_DOMAIN}'. Please verify if this is correct."]
+        except Exception as e:
+            logging.error(f"Error reading Jira link file: {e}")
+            raise
         return []
     
     def _check_pr_link(self, file_path: str) -> List[str]:
         """Check if PR link contains required domain."""
-        with open(file_path, 'r') as file:
-            content = file.read().strip()
-            if self.REQUIRED_PR_DOMAIN not in content:
-                return [f"⚠️ PR link doesn't contain '{self.REQUIRED_PR_DOMAIN}'. Please verify if this is correct."]
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read().strip()
+                if self.REQUIRED_PR_DOMAIN not in content:
+                    return [f"⚠️ PR link doesn't contain '{self.REQUIRED_PR_DOMAIN}'. Please verify if this is correct."]
+        except Exception as e:
+            logging.error(f"Error reading PR link file: {e}")
+            raise
         return []
     
     def post_comment(self, pr_number: str, warnings_list: List[str]) -> None:
@@ -128,6 +137,7 @@ class PRFieldValidator:
             "_Note: These are warnings only. Reviewers may proceed with the merge if they determine these warnings are not relevant to this PR._"
         )
 
+
 def main():
     """Main function to run the PR field validation."""
     try:
@@ -154,8 +164,9 @@ def main():
             logging.info("All fields look good!")
             
     except Exception as e:
-        logging.error(f"An error occurred: {str(e)}")
+        logging.error(f"An error occurred: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
