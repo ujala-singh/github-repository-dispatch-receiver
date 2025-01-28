@@ -85,6 +85,7 @@ class PRFieldValidator:
             length = len(content.strip())
             logging.info(f"Description length: {length} characters")
             if length < self.MIN_DESCRIPTION_LENGTH:
+                logging.warning(f"Description is {length} characters (minimum {self.MIN_DESCRIPTION_LENGTH} required)")
                 return [f"⚠️ Description is {length} characters (minimum {self.MIN_DESCRIPTION_LENGTH} required). Consider adding more details."]
         return []
     
@@ -94,6 +95,7 @@ class PRFieldValidator:
             content = file.read().strip()
             logging.info(f"Checking Jira link: {content}")
             if not content or self.REQUIRED_JIRA_DOMAIN not in content:
+                logging.warning(f"Jira link doesn't contain '{self.REQUIRED_JIRA_DOMAIN}'")
                 return [f"⚠️ Jira ticket link doesn't contain '{self.REQUIRED_JIRA_DOMAIN}'. Please verify if this is correct."]
         return []
     
@@ -103,6 +105,7 @@ class PRFieldValidator:
             content = file.read().strip()
             logging.info(f"Checking PR link: {content}")
             if not content or self.REQUIRED_PR_DOMAIN not in content:
+                logging.warning(f"PR link doesn't contain '{self.REQUIRED_PR_DOMAIN}'")
                 return [f"⚠️ PR link doesn't contain '{self.REQUIRED_PR_DOMAIN}'. Please verify if this is correct."]
         return []
     
