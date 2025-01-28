@@ -29,7 +29,7 @@ class PRFieldValidator:
     """
     A class to handle validation of Pull Request fields and posting comments.
     """
-    
+
     def __init__(self):
         """
         Initialize the validator with GitHub token and required configurations.
@@ -50,13 +50,13 @@ class PRFieldValidator:
         self.REQUIRED_PR_DOMAIN = "github.com/atlanhq"
         
         logging.info("PRFieldValidator initialized successfully")
-        
+
     def validate_fields(self, field_paths: Dict[str, str]) -> List[str]:
         """
         Check all fields for potential issues.
         """
         warnings_list = [] 
-        
+
         for field_path, field_name in field_paths.items():
             try:
                 if "description" in field_path.lower():
@@ -71,7 +71,7 @@ class PRFieldValidator:
                 
         logging.info(f"Found {len(warnings_list)} warnings: {warnings_list}")
         return warnings_list
-    
+
     def _check_description(self, file_path: str) -> List[str]:
         """Check if description meets length requirements."""
         try:
@@ -83,7 +83,7 @@ class PRFieldValidator:
             logging.error(f"Error reading description file: {e}")
             raise
         return []
-    
+
     def _check_jira_link(self, file_path: str) -> List[str]:
         """Check if Jira link contains required domain."""
         try:
@@ -95,7 +95,7 @@ class PRFieldValidator:
             logging.error(f"Error reading Jira link file: {e}")
             raise
         return []
-    
+
     def _check_pr_link(self, file_path: str) -> List[str]:
         """Check if PR link contains required domain."""
         try:
@@ -107,7 +107,7 @@ class PRFieldValidator:
             logging.error(f"Error reading PR link file: {e}")
             raise
         return []
-    
+
     def post_comment(self, pr_number: str, warnings_list: List[str]) -> None:
         """
         Post warnings as a comment on the PR.
@@ -115,18 +115,18 @@ class PRFieldValidator:
         if not warnings_list:
             logging.info("No warnings to post")
             return
-            
+
         comment = self._format_comment(warnings_list)
-        
+
         headers = {
             "Authorization": f"Bearer {self.github_token}",
             "Accept": "application/vnd.github.v3+json",
             "Content-Type": "application/json"
         }
-        
-        url = f"https://api.github.com/repos/atlanhq/atlan/issues/{pr_number}/comments"
+
+        url = f"https://api.github.com/repos/ujala-singh/github-repository-dispatch-receiver/issues/{pr_number}/comments"
         logging.info(f"Posting comment to PR #{pr_number}")
-        
+
         try:
             response = requests.post(url, headers=headers, json={"body": comment})
             response.raise_for_status()
@@ -135,7 +135,7 @@ class PRFieldValidator:
             logging.error(f"Failed to add comment: {str(e)}")
             if hasattr(e.response, 'text'):
                 logging.error(f"Response: {e.response.text}")
-    
+
     def _format_comment(self, warnings_list: List[str]) -> str:
         """Format warnings into a Markdown comment."""
         return (
@@ -150,34 +150,34 @@ class PRFieldValidator:
 def main():
     """Main function to run the PR field validation."""
     logging.info("Starting PR field validation")
-    
+
     try:
         if len(sys.argv) < 2:
             raise ValueError("PR number not provided. Usage: script.py <pr_number>")
-            
+
         pr_number = sys.argv[1]
         logging.info(f"Validating PR #{pr_number}")
-        
+
         # Initialize validator
         validator = PRFieldValidator()
-        
+
         # Define paths to check
         field_paths = {
             "/tmp/description.txt": "Description",
             "/tmp/jira.txt": "Jira Ticket Links",
             "/tmp/pr_link.txt": "PR Links"
         }
-        
+
         # Run validation
         warnings_list = validator.validate_fields(field_paths)
-        
+
         # Handle results
         if warnings_list:
             validator.post_comment(pr_number, warnings_list)
             logging.info("Warnings found and commented on PR")
         else:
             logging.info("All fields look good!")
-            
+
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         sys.exit(1)
