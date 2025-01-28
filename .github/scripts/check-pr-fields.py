@@ -16,6 +16,14 @@ import requests
 from typing import Dict, List
 import logging
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 class PRFieldValidator:
     """
@@ -41,30 +49,27 @@ class PRFieldValidator:
         self.REQUIRED_JIRA_DOMAIN = "atlanhq.atlassian.net"
         self.REQUIRED_PR_DOMAIN = "github.com/atlanhq"
         
+        logging.info("PRFieldValidator initialized successfully")
+        
     def validate_fields(self, field_paths: Dict[str, str]) -> List[str]:
         """
         Check all fields for potential issues.
-        
-        Args:
-            field_paths (dict): Dictionary mapping file paths to field names
-            
-        Returns:
-            list: List of warning messages for any issues found
         """
         warnings_list = [] 
         
         for field_path, field_name in field_paths.items():
             try:
-                if "description" in field_path:
+                if "description" in field_path.lower():
                     warnings_list.extend(self._check_description(field_path))
-                elif "jira" in field_path:
+                elif "jira" in field_path.lower():
                     warnings_list.extend(self._check_jira_link(field_path))
-                elif "pr_link" in field_path:
+                elif "pr_link" in field_path.lower():
                     warnings_list.extend(self._check_pr_link(field_path))
             except Exception as e:
                 logging.error(f"Error validating {field_name}: {e}")
                 warnings_list.append(f"⚠️ Error validating {field_name}: {e}")
                 
+        logging.info(f"Found {len(warnings_list)} warnings: {warnings_list}")
         return warnings_list
     
     def _check_description(self, file_path: str) -> List[str]:
@@ -106,26 +111,30 @@ class PRFieldValidator:
     def post_comment(self, pr_number: str, warnings_list: List[str]) -> None:
         """
         Post warnings as a comment on the PR.
-        
-        Args:
-            pr_number (str): PR number to comment on
-            warnings_list (list): List of warning messages to post
         """
+        if not warnings_list:
+            logging.info("No warnings to post")
+            return
+            
         comment = self._format_comment(warnings_list)
         
         headers = {
             "Authorization": f"Bearer {self.github_token}",
+            "Accept": "application/vnd.github.v3+json",
             "Content-Type": "application/json"
         }
         
         url = f"https://api.github.com/repos/atlanhq/atlan/issues/{pr_number}/comments"
-        response = requests.post(url, headers=headers, json={"body": comment})
+        logging.info(f"Posting comment to PR #{pr_number}")
         
-        if response.status_code == 201:
+        try:
+            response = requests.post(url, headers=headers, json={"body": comment})
+            response.raise_for_status()
             logging.info("Comment added successfully")
-        else:
-            logging.error(f"Failed to add comment. Status code: {response.status_code}")
-            logging.error(f"Response: {response.text}")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Failed to add comment: {str(e)}")
+            if hasattr(e.response, 'text'):
+                logging.error(f"Response: {e.response.text}")
     
     def _format_comment(self, warnings_list: List[str]) -> str:
         """Format warnings into a Markdown comment."""
@@ -140,8 +149,14 @@ class PRFieldValidator:
 
 def main():
     """Main function to run the PR field validation."""
+    logging.info("Starting PR field validation")
+    
     try:
+        if len(sys.argv) < 2:
+            raise ValueError("PR number not provided. Usage: script.py <pr_number>")
+            
         pr_number = sys.argv[1]
+        logging.info(f"Validating PR #{pr_number}")
         
         # Initialize validator
         validator = PRFieldValidator()
