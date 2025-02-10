@@ -3,41 +3,49 @@ name: Check PR Fields
 on:
   pull_request:
     types:
-      - opened
-      - edited
-      - synchronize
+    - opened
+    - edited
+    - synchronize
 
 jobs:
   check_fields:
     runs-on: ubuntu-latest
     if: github.event.pull_request.base.ref == 'main'
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.MY_PAT }}
-          fetch-depth: 0
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.my_pat }}
+        fetch-depth: 0
 
-      - name: Run Script to Extract Fields
-        run: |
-          bash ./.github/scripts/extract-fields.sh "${{ github.event.pull_request.body }}"
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
-        shell: bash
+    - name: Store PR Body in a Variable
+      run: |
+        PR_BODY=$(cat <<EOF
+        ${{ github.event.pull_request.body }}
+        EOF
+        )
+        echo "$PR_BODY" > /tmp/pr_body.txt
 
-      - name: echo description.txt
-        run: |
-          cat /tmp/description.txt
+    - name: Run Script to Extract Fields
+      run: |
+        bash ./.github/scripts/extract-fields.sh "${{ github.event.pull_request.body }}"
+      env:
+        GH_TOKEN: ${{ secrets.my_pat }}
+      shell: bash
 
-      - name: echo jira.txt
-        run: |
-          cat /tmp/jira.txt
+    - name: echo description.txt
+      run: |
+        cat /tmp/description.txt
 
-      - name: echo pr_link.txt
-        run: |
-          cat /tmp/pr_link.txt
+    - name: echo jira.txt
+      run: |
+        cat /tmp/jira.txt
 
-      - name: Run Python Script to Check Fields
-        run: |
-          python ./.github/scripts/check-pr-fields.py "${{ github.event.pull_request.number }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+    - name: echo pr_link.txt
+      run: |
+        cat /tmp/pr_link.txt
+
+    - name: Run Python Script to Check Fields
+      run: |
+        python ./.github/scripts/check-pr-fields.py "${{ github.event.pull_request.number }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.my_pat }}
