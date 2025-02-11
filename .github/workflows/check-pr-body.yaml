@@ -18,16 +18,17 @@ jobs:
         fetch-depth: 0
 
     - name: Store PR Body in a Variable
+      id: github_pr_body
       run: |
-        PR_BODY=$(cat <<EOF
-        ${{ github.event.pull_request.body }}
-        EOF
-        )
-        echo "$PR_BODY" > /tmp/pr_body.txt
+        {
+         echo "GITHUB_PR_BODY<<EOF"
+         echo "${{ github.event.pull_request.body }}"
+         echo "EOF"
+        } >> "$GITHUB_OUTPUT"
 
     - name: Run Script to Extract Fields
       run: |
-        bash ./.github/scripts/extract-fields.sh "${{ github.event.pull_request.body }}"
+        bash ./.github/scripts/extract-fields.sh "${{ steps.github_pr_body.outputs.GITHUB_PR_BODY }}"
       env:
         GH_TOKEN: ${{ secrets.my_pat }}
       shell: bash
