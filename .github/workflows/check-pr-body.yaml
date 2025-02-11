@@ -17,16 +17,21 @@ jobs:
           token: ${{ secrets.MY_PAT }}
           fetch-depth: 0
 
-      - name: Run Script to Extract Fields
-        run: |
-          bash ./.github/scripts/extract-fields.sh "${{ github.event.pull_request.body }}"
-        env:
-          GH_TOKEN: ${{ secrets.MY_PAT }}
-        shell: bash
+    - name: Store PR Body in a Variable
+      id: github_pr_body
+      run: |
+        {
+         echo "GITHUB_PR_BODY<<EOF"
+         echo "${{ github.event.pull_request.body }}"
+         echo "EOF"
+        } >> "$GITHUB_OUTPUT"
 
-      - name: echo description.txt
-        run: |
-          cat /tmp/description.txt
+    - name: Run Script to Extract Fields
+      run: |
+        bash ./.github/scripts/extract-fields.sh "${{ steps.github_pr_body.outputs.GITHUB_PR_BODY }}"
+      env:
+        GH_TOKEN: ${{ secrets.my_pat }}
+      shell: bash
 
       - name: echo jira.txt
         run: |
